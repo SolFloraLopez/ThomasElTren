@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    html
-    </html>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -15,14 +14,20 @@
 </head>
 
 <body>
+    
     <h1>TrainVoluted</h1>
-    <p>
+    <div class="btn-group">
+            <button onclick="window.location.href = '#section1'">Jugar</button>
+            <button onclick="window.location.href = '#section2'">Sobre TrainVoluted</button>
+            <button onclick="window.location.href = '#section3'">Cómo jugar</button>
+    </div>
+    <p class="main" id="section2">
         <img src="/img/nokia.png" alt="Nokia" style="float:right;width:550px;height:600px; margin-right: auto;border-radius: 5px;"><b>TrainVoluted</b> mezcla elementos típicos del género Arcade de Snake con elementos de Gestión de Recursos/Puzzle.Al contrario que en otros juegos<br> del género Snake, en TrainVoluted el jugador deberá guiar un tren,<br> equivalente a la serpiente en otros juegos, hacia sus pasajeros colocando raíles para formar una vía, en lugar de controlar a la serpiente directamente.
     </p>
     <p>
     <img src="/img/trainsnake.png" alt="TrainSnake"style="width:630px;height:370px;border-radius:10px;margin-left: 8px;"> <img src="/img/traincity.jpg" alt="TrainCity" style="width:600px;height:370px; margin-left:10px;border-radius:10px;"><br><br> En este juego se premia la habilidad mecánica del jugador para mover los <b>raíles</b> y la capacidad de gestionar bajo presión el uso de estos, pues se debe tener en cuenta el aumento de <b>velocidad</b> progresiva del tren al recoger a los <b>pasajeros</b>, el número de raíles del que se dispone tanto en el <b>inventario</b> como colocados en el mapa, el aumento de <b>vagones</b> que dificultan el espacio de movimiento para el tren, los <b>obstáculos</b> del propio mapa y el objetivo principal, los pasajeros que se deben recoger en el trayecto para aumentar la <b>puntuación.</b>
     </p>
-
+    <div class="main" id="section1">
     <script type="module">
         import Game from './game.js';
 
@@ -43,7 +48,7 @@
         };
         new Phaser.Game(config);
     </script>
-
+    </div>
 
 </body>
 </html>

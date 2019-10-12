@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-image: url('/img/background.png');
   background-size: cover;
@@ -26,3 +30,30 @@ p {
   text-align: center;
  margin: 25px;
 } 
+.btn-group button {
+  background-color: rgb(17, 59, 59); /* Green background */
+  border: 5px solid rgb(0, 0, 0); /* Green border */
+  color: rgb(255, 4, 4); /* White text */
+  padding: 10px 24px; /* Some padding */
+  cursor: pointer; /* Pointer/hand icon */
+  float: left; /* Float the buttons side by side */
+  font-size: 55px;
+  border-radius: 5px;
+}
+
+.btn-group button:not(:last-child) {
+  border-right: none; /* Prevent double borders */
+}
+
+/* Clear floats (clearfix hack) */
+.btn-group:after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/* Add a background color on hover */
+.btn-group button:hover {
+  background-color: #3e8e41;
+  color: white;
+}
