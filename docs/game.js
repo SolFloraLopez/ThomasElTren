@@ -3,12 +3,12 @@ export default class Game extends Phaser.Scene {
     super({ key: 'main' });
   }
   preload() { 
-    this.load.image('moneco','img/nokia.png');
-
+    this.load.spritesheet(
+      'keyspritesheet', 'img/nokia.png', { frameWidth: 500, frameHeight: 500 });
   }
 
   create() {
-    player = scene.add.image(100,200,'moneco');
+    this.add.sprite(300, 200, 'keyspritesheet');
   }
 
   update(time, delta) {    
