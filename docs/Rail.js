@@ -1,8 +1,10 @@
+import {directionEnum, matrixEnum} from './Enums.js'
+
 export default class Rail extends Phaser.GameObjects.Sprite
 {
-    constructor(scene, x, y, texture, pointer)
+    constructor(scene, columna, fila, texture, pointer)
     {
-        super(scene, x, y, texture);
+        super(scene, (columna * 50) + 25, (fila * 50) + 25, texture);
         scene.add.existing(this).setInteractive();
         scene.input.setDraggable(this);
 
@@ -13,6 +15,7 @@ export default class Rail extends Phaser.GameObjects.Sprite
             
         });
         
+        this.orientation = directionEnum.NONE;
         this.selected = false;
         this.pointer = pointer;
     }
@@ -21,8 +24,10 @@ export default class Rail extends Phaser.GameObjects.Sprite
     {
         if(!this.pointer.isDown)
         {       
-            this.x = Math.floor(this.x / 50) * 50 + 25;
-            this.y = Math.floor(this.y / 50) * 50 + 25;
+            this.columna = Math.floor(this.x / 50);
+            this.fila = Math.floor(this.y / 50);
+            this.x = (this.columna * 50) + 25;
+            this.y = (this.fila * 50) + 25;
         }
     }
 }

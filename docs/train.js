@@ -1,24 +1,34 @@
+import {directionEnum, matrixEnum} from './Enums.js'
+
 export default class Train extends Phaser.GameObjects.Sprite
 { 
-    constructor(scene, x, y, texture)
+    constructor(scene, column, fila, texture)
     {
-        super(scene, x, y, texture);
+        super(scene, (column * 50) + 25, (fila * 50) + 25, texture);
         scene.add.existing(this);
 
-        this.direction = scene.directionEnum.DOWN;
-        this.speed = 10;
+        this.column = column;
+        this.fila = fila;
+        this.direction = directionEnum.UP;
+        this.speed = 1;
+        this.setDepth(1);
     }
 
-     preUpdate()
+    preUpdate()
      {
-         this.Move(this.speed)
-     }
-
-    ReturnPos() 
-    {
-        return this.x;   
+        this.Move(this.speed)
+        this.column = Math.floor(this.x / 50);
+        this.fila = Math.floor(this.y / 50);
+        
+        //console.table([{name: 'column', amount: this.column}, {name: 'fila', amount: this.fila}, {name: 'x', amount: this.x}, {name: 'y', amount: this.y}]);
     }
 
+    ReturnPos()
+     {
+          let pos = {x: this.x,  y: this.y};
+          return pos;
+     }
+     
     Move(amount)
     {
         if(Math.abs(this.direction % 2 == 0)) this.y += amount * (this.direction / 2);
@@ -31,6 +41,16 @@ export default class Train extends Phaser.GameObjects.Sprite
         this.direction = direction;
     }
 
-    IsDragged(){}
+    ReturnTile()
+    {
+        let tile = {column: this.column, fila: this.fila}
+
+        return tile;
+    }
+
+    ReturnDirection()
+    {
+        return this.direction;
+    }
 }
 
