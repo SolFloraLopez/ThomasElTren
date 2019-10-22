@@ -2,9 +2,9 @@ import {directionEnum, matrixEnum} from './Enums.js'
 
 export default class Rail extends Phaser.GameObjects.Sprite
 {
-    constructor(scene, columna, fila, texture, pointer)
+    constructor(scene, column, row, texture, pointer, orientation)
     {
-        super(scene, (columna * 50) + 25, (fila * 50) + 25, texture);
+        super(scene, (column * 50) + 25, (row * 50) + 25, texture);
         scene.add.existing(this).setInteractive();
         scene.input.setDraggable(this);
 
@@ -15,19 +15,36 @@ export default class Rail extends Phaser.GameObjects.Sprite
             
         });
         
-        this.orientation = directionEnum.NONE;
+        this.column = column;
+        this.row = row;
+        this.orientation = orientation;
         this.selected = false;
         this.pointer = pointer;
+
+        if (orientation != 2) this.angle = -(this.orientation * 90);
+        else this.angle = 0;
     }
 
     preUpdate()
     {
         if(!this.pointer.isDown)
         {       
-            this.columna = Math.floor(this.x / 50);
-            this.fila = Math.floor(this.y / 50);
-            this.x = (this.columna * 50) + 25;
-            this.y = (this.fila * 50) + 25;
+            this.column = Math.floor(this.x / 50);
+            this.row = Math.floor(this.y / 50);
+            this.x = (this.column * 50) + 25;
+            this.y = (this.row * 50) + 25;
         }
+    }
+
+    ReturnTile()
+    {
+        let tile = {column: this.column, row: this.row}
+
+        return tile;
+    }
+
+    ReturnOrientation()
+    {
+        return this.orientation;
     }
 }
