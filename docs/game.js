@@ -5,7 +5,7 @@ import {directionEnum, matrixEnum} from './Enums.js'
 const COLUMNS_CONST = 28;
 const ROWS_CONST = 16;
 const POOL_LENGTH_CONST = 100;
-const TRAIN_SPEED_CONST = 2;
+const TRAIN_SPEED_CONST = 0.5;
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -13,7 +13,7 @@ export default class Game extends Phaser.Scene {
 
     this.points = 0;
     this.railPool = [];
-    this.trainArray = []
+    this.trainArray = [];
     this.gameMatrix = [];
   }
 

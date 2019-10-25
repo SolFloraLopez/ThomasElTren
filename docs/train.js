@@ -16,7 +16,7 @@ export default class Train extends Phaser.GameObjects.Sprite
 
     preUpdate()
      {
-        this.Move(this.speed)
+        this.Move(this.speed);
         this.column = Math.floor(this.x / 50);
         this.row = Math.floor(this.y / 50);
         
