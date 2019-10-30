@@ -1,8 +1,8 @@
 import {directionEnum, matrixEnum} from './Enums.js'
 
-export default class Rail extends Phaser.GameObjects.Sprite
+export default class CurvedRail extends Phaser.GameObjects.Sprite
 {
-    constructor(scene, column, row, texture, pointer, orientation)
+    constructor(scene, column, row, texture, pointer, orientation1, orientation2)
     {
         super(scene, (column * 50) + 25, (row * 50) + 25, texture);
         scene.add.existing(this).setInteractive();
@@ -17,11 +17,12 @@ export default class Rail extends Phaser.GameObjects.Sprite
         
         this.column = column;
         this.row = row;
-        this.orientation = orientation;
+        this.orientation1 = orientation1;
+        this.orientation2 = orientation2;
         this.selected = false;
         this.pointer = pointer;
 
-        if (orientation != 2) this.angle = -(this.orientation * 90);
+        if (orientation1 != 2) this.angle = (this.orientation1 + this.orientation2) * 90 + 90;
         else this.angle = 0;
     }
 
@@ -45,6 +46,6 @@ export default class Rail extends Phaser.GameObjects.Sprite
 
     ReturnOrientation()
     {
-        return this.orientation;
+        return this.orientation1;
     }
 }

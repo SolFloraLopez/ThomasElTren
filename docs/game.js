@@ -1,5 +1,5 @@
 import Train, * as train from './train.js'
-import Rail, * as rail from './Rail.js'
+import CurvedRail, * as curvedRail from './CurvedRail.js'
 import {directionEnum, matrixEnum} from './Enums.js'
 
 const COLUMNS_CONST = 28;
@@ -35,12 +35,16 @@ export default class Game extends Phaser.Scene {
     this.plantilla = this.add.sprite(700, 400, 'plantillasprite');
     this.trainArray[0] = new Train(this, 14, 14, 'trainsprite', TRAIN_SPEED_CONST);
     this.trainArray[1] = new Train(this, 14, 15, 'trainsprite', TRAIN_SPEED_CONST);
-    new Rail(this, 10, 10, 'curvedrailsprite', this.input.activePointer, 0);
+    new CurvedRail(this, 10, 10, 'curvedrailsprite', this.input.activePointer, 0);
 
     for(let i = 0; i < POOL_LENGTH_CONST; i++)
     {
-      let dir = ((i % 2) + 1) * Math.sign(-2.1 + 1 + i % 4);
-      this.railPool[i] = new Rail(this, i % 4, 9, 'railsprite', this.input.activePointer, dir);   
+      let dir1;
+
+      if(i % 4 < 2) dir1 = -2;
+      else dir1 = 2;
+      let dir2 = - 1 + (i % 2) * 2;
+      this.railPool[i] = new CurvedRail(this, i % 4, 9, 'curvedrailsprite', this.input.activePointer, dir1, dir2);   
       console.log(this.railPool[i].ReturnTile());
       console.log(this.railPool[i].ReturnOrientation());
     }
