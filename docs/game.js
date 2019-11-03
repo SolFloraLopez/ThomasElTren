@@ -1,5 +1,6 @@
 import Train, * as train from './train.js'
 import Rail, * as rail from './Rail.js'
+import Passenger, * as passenger from './passenger.js'
 import {directionEnum, matrixEnum} from './Enums.js'
 
 const COLUMNS_CONST = 28;
@@ -23,6 +24,7 @@ export default class Game extends Phaser.Scene {
     this.load.image('plantillasprite', 'img/Plantilla.png', {frameWidth: 1400, frameHeight: 800})
     this.load.image('railsprite', 'img/rail.png', {frameWidth: 27, frameHeight: 40})
     this.load.image('trainsprite', 'img/trainwagon.png', { frameWidth: 50, frameHeight: 50 })
+    this.load.image('passengersprite', 'img/passenger.png', { frameWidth: 50, frameHeight: 50 })
   }
 
   create() 
@@ -34,6 +36,7 @@ export default class Game extends Phaser.Scene {
     this.plantilla = this.add.sprite(700, 400, 'plantillasprite');
     this.trainArray[0] = new Train(this, 14, 14, 'trainsprite', TRAIN_SPEED_CONST);
     this.trainArray[1] = new Train(this, 14, 15, 'trainsprite', TRAIN_SPEED_CONST);
+    this.passenger = new Passenger(this,10,10,'passengersprite');
 
     for(let i = 0; i < POOL_LENGTH_CONST; i++)
     {
