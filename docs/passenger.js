@@ -16,4 +16,10 @@ export default class Rail extends Phaser.GameObjects.Sprite{
         this.column = Math.floor(this.x / 50);
         this.row = Math.floor(this.y / 50);
     }
+
+    ReturnTile()
+    {
+        let tile = {column: this.column, row: this.row}
+        return tile;
+    }
 }
