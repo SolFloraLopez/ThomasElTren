@@ -1,4 +1,4 @@
-import {directionEnum, matrixEnum} from './Enums.js'
+import {directionEnum, matrixEnum, stateEnum} from './Enums.js'
 
 export default class CurvedRail extends Phaser.GameObjects.Sprite
 {
@@ -21,19 +21,36 @@ export default class CurvedRail extends Phaser.GameObjects.Sprite
         this.orientation2 = orientation2;
         this.selected = false;
         this.pointer = pointer;
+        this.state = stateEnum.ONTRACK;
 
-        if (orientation1 != 2) this.angle = (this.orientation1 + this.orientation2) * 90 + 90;
-        else this.angle = 0;
+        switch (orientation1 + orientation2)
+      {
+        case -3:
+          this.angle = 180;
+          break;
+        case -1:
+          this.angle = 270;
+          break;
+        case 1:
+          this.angle = 90; 
+          break;
+        case 3:
+          this.angle = 0;
+          break;
+      }
     }
 
     preUpdate()
     {
-        if(!this.pointer.isDown)
-        {       
-            this.column = Math.floor(this.x / 50);
-            this.row = Math.floor(this.y / 50);
-            this.x = (this.column * 50) + 25;
-            this.y = (this.row * 50) + 25;
+        if (this.state == stateEnum.ONTRACK)
+        {
+            if(!this.pointer.isDown)
+            {       
+                this.column = Math.floor(this.x / 50);
+                this.row = Math.floor(this.y / 50);
+                this.x = (this.column * 50) + 25;
+                this.y = (this.row * 50) + 25;
+            }
         }
     }
 
@@ -46,6 +63,12 @@ export default class CurvedRail extends Phaser.GameObjects.Sprite
 
     ReturnOrientation()
     {
-        return this.orientation1;
+        let orientation = {First: this.orientation1 , Second: this.orientation2}
+        return orientation;
+    }
+
+    ChangeState(state) 
+    {
+        this.state = state;
     }
 }
