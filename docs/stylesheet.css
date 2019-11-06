@@ -103,13 +103,13 @@ p1 {
   border-radius: 5px;
 }
 #trainSnake{
-  width:38%;
+  width:37%;
   height:auto;
   border-radius:10px;
 }
 #trainCity{
-  width:17em;
-  height:12em;
+  width: 29%;
+  height: auto;
    margin-left:2%;
    border-radius:10px;
 }
