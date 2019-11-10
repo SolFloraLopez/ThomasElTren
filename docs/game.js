@@ -24,8 +24,10 @@ export default class Game extends Phaser.Scene {
 
   preload()
   {
-    this.load.image('fondosprite', 'img/fondo.png', {frameWidth: 1400, frameHeight: 800})
-    this.load.image('plantillasprite', 'img/Plantilla.png', {frameWidth: 1400, frameHeight: 800})
+    // this.load.image('fondosprite', 'img/fondo.png', {frameWidth: 1400, frameHeight: 800})
+    // this.load.image('plantillasprite', 'img/Plantilla.png', {frameWidth: 1400, frameHeight: 800})
+    this.load.tilemapTiledJSON('tilemap','./tilemap.json')
+    this.load.image('patronesTilemap','img/casilla.png')
     this.load.image('railsprite', 'img/rail.png', {frameWidth: 32, frameHeight: 48})
     this.load.image('trainsprite', 'img/trainwagon.png', { frameWidth: 50, frameHeight: 50 })
 
@@ -37,11 +39,19 @@ export default class Game extends Phaser.Scene {
 
   create()
   {
+    this.map = this.make.tilemap({
+      key: 'tilemap',
+      tileWidth: 64,
+      tileHeight: 64
+    });
+    this.map.addTilesetImage('casilla','patronesTilemap');
+    this.backgroundLayer = this.map.createStaticLayer('Background','casilla');
+    
     this.createMatrix(this.gameMatrix);
     console.log(this.gameMatrix[0][0].object);
 
-    this.add.sprite(700, 400, 'fondosprite');
-    this.plantilla = this.add.sprite(700, 400, 'plantillasprite');
+    // this.add.sprite(700, 400, 'fondosprite');
+    // this.plantilla = this.add.sprite(700, 400, 'plantillasprite');
 
     this.trainArray[0] = new Train(this, 14, 14, 'trainsprite', TRAIN_SPEED);
     this.trainArray[1] = new Train(this, 14, 15, 'trainsprite', TRAIN_SPEED);
