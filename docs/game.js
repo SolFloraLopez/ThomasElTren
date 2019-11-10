@@ -45,7 +45,7 @@ export default class Game extends Phaser.Scene {
 
     this.trainArray[0] = new Train(this, 14, 14, 'trainsprite', TRAIN_SPEED);
     this.trainArray[1] = new Train(this, 14, 15, 'trainsprite', TRAIN_SPEED);
-    this.passenger = new Passenger(this,10,10,'passengersprite');
+    this.passenger = new Passenger(this,14,9,'passengersprite');
     new CurvedRail(this, 10, 10, 'curvedrailsprite', this.input.activePointer, 0);
 
 
@@ -129,8 +129,11 @@ export default class Game extends Phaser.Scene {
 
           k++;
         }
+        let passengerTile = this.passenger.ReturnTile();
+        if (passengerTile.column == i && passengerTile.row == j) this.gameMatrix[i][j] = {object: matrixEnum.PASSENGER, direction: directionEnum.NONE}
       }
     }
+
   }
 
   checkTrain(i)
@@ -148,6 +151,7 @@ export default class Game extends Phaser.Scene {
       else this.changeState(stateEnum.CRASHED);
       console.log(trainTile);
     }
+    else if(tileObject == matrixEnum.PASSENGER) this.passenger.destroy();
   }
 
   changeState(state)
