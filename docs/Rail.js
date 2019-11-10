@@ -1,6 +1,6 @@
 import {directionEnum, matrixEnum} from './Enums.js'
 
-export default class Rail extends Phaser.GameObjects.Sprite
+export default class CurvedRail extends Phaser.GameObjects.Sprite
 {
     constructor(scene, column, row, texture, pointer, orientation)
     {

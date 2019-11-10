@@ -9,7 +9,14 @@ export let directionEnum = {
  export let matrixEnum = {
     EMPTY: 0,
     RAIL: 1,
-    PASSENGER: 2,
-    AVOIDABLE: 3,
-    UNAVOIDABLE: 4,
+    CURVE: 2,
+    PASSENGER: 3,
+    AVOIDABLE: 4,
+    UNAVOIDABLE: 5,
  };
+
+ export let stateEnum = {
+   ONTRACK: 0,
+   CRASHED: 1,
+   PAUSE: 2,
+};

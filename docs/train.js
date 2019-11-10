@@ -1,4 +1,4 @@
-import {directionEnum, matrixEnum} from './Enums.js'
+import {directionEnum, matrixEnum, stateEnum, } from './Enums.js'
 
 export default class Train extends Phaser.GameObjects.Sprite
 { 
@@ -11,22 +11,26 @@ export default class Train extends Phaser.GameObjects.Sprite
         this.row = row;
         this.direction = directionEnum.UP;
         this.speed = speed;
+        this.state = stateEnum.ONTRACK;
         this.setDepth(1);
     }
 
     preUpdate()
      {
-        this.Move(this.speed);
-        this.column = Math.floor(this.x / 50);
-        this.row = Math.floor(this.y / 50);
+        if (this.state == stateEnum.ONTRACK) 
+        {
+            this.Move(this.speed);
+            this.column = Math.floor(this.x / 50);
+            this.row = Math.floor(this.y / 50);
+        }
         
         //console.table([{name: 'column', amount: this.column}, {name: 'row', amount: this.row}, {name: 'x', amount: this.x}, {name: 'y', amount: this.y}]);
     }
 
     ReturnPos()
      {
-          let pos = {x: this.x,  y: this.y};
-          return pos;
+        let pos = {x: this.x,  y: this.y};
+        return pos;
      }
      
     Move(amount)
@@ -52,6 +56,11 @@ export default class Train extends Phaser.GameObjects.Sprite
     ReturnDirection()
     {
         return this.direction;
+    }
+
+    ChangeState(state) 
+    {
+        this.state = state;
     }
 }
 
