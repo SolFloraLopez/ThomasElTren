@@ -1,19 +1,25 @@
 import {directionEnum, matrixEnum, stateEnum} from './Enums.js'
 
-export default class CurvedRail extends Phaser.GameObjects.Sprite
+export default class CurvedRail extends Phaser.Physics.Arcade.Sprite
 {
     constructor(scene, column, row, texture, pointer, orientation1, orientation2)
     {
         super(scene, (column * 50) + 25, (row * 50) + 25, texture);
         scene.add.existing(this).setInteractive();
+        scene.physics.add.existing(this);
         scene.input.setDraggable(this);
 
-        scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
 
+        scene.input.on('dragstart', function (pointer, gameObject, dragX, dragY) {
+          gameObject.body.enable = false;
+      });
+        scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
             gameObject.x = dragX;
             gameObject.y = dragY;
-            
         });
+        scene.input.on('dragend', function (pointer, gameObject, dragX, dragY) {
+          gameObject.body.enable = true;
+      });
         
         this.column = column;
         this.row = row;
@@ -27,15 +33,19 @@ export default class CurvedRail extends Phaser.GameObjects.Sprite
       {
         case -3:
           this.angle = 180;
+          this.railType = 0;
           break;
         case -1:
           this.angle = 270;
+          this.railType = 1;
           break;
         case 1:
           this.angle = 90; 
+          this.railType = 2;
           break;
         case 3:
           this.angle = 0;
+          this.railType = 3;
           break;
       }
     }
@@ -71,4 +81,15 @@ export default class CurvedRail extends Phaser.GameObjects.Sprite
     {
         this.state = state;
     }
+    ReturnRailType(){
+      return this.railType;
+    }
+    ReturnPos(){
+      let pos = {x: this.x,  y: this.y};
+      return pos;
+   }
+   OnDrag(dragging){
+     console.log(dragging);
+     return dragging;
+   }
 }

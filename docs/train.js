@@ -8,6 +8,7 @@ export default class Train extends Phaser.Physics.Arcade.Sprite
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.setCollideWorldBounds(true)
+        this.body.setSize(40,40);
 
         this.column = column;
         this.row = row;
@@ -38,9 +39,42 @@ export default class Train extends Phaser.Physics.Arcade.Sprite
     Move(amount,time,delta)
     {
         this.body.setVelocity(0);
-        if(Math.abs(this.direction % 2 == 0))this.body.setVelocityY(10 * delta *-1)
-        else this.body.setVelocityX(amount * this.direction);
+        if(this.direction!=directionEnum.NONE){
+            if(Math.abs(this.direction % 2 == 0))this.body.setVelocityY(10 * delta *-1)
+            else this.body.setVelocityX(10 * delta *-1);
+        }
+        
 
+    }
+    Compatible(rail){
+        let compatible = true;
+        switch(this.direction){
+            case directionEnum.UP:
+                if((rail.ReturnRailType()===0 || rail.ReturnRailType()===1) && this.y>rail.ReturnPos().y)compatible = false;
+                break;
+            case directionEnum.DOWN:
+                break;
+            case directionEnum.LEFT:
+                break;
+            case directionEnum.RIGHT:
+                break;
+        }
+        return compatible;
+        
+
+
+    }
+    ChangeDirection2(){
+        switch(this.direction){
+            case directionEnum.UP:
+                break;
+            case directionEnum.DOWN:
+                break;
+            case directionEnum.LEFT:
+                break;
+            case directionEnum.RIGHT:
+                break;
+        }
     }
 
     ChangeDirection(direction)

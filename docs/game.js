@@ -9,7 +9,7 @@ import {directionEnum, matrixEnum, stateEnum} from './Enums.js'
 const COLUMNS = 28;
 const ROWS = 16;
 const POOL_LENGTH = 100;
-const TRAIN_SPEED = 50;
+const TRAIN_SPEED = 10;
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -55,6 +55,17 @@ export default class Game extends Phaser.Scene {
     collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
     faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
     });
+   
+
+    this.railsGroup = this.physics.add.group();
+    this.trainsGroup = this.physics.add.group();
+
+    
+
+
+
+
+    
     this.createMatrix(this.gameMatrix);
     console.log(this.gameMatrix[0][0].object);
 
@@ -63,7 +74,11 @@ export default class Game extends Phaser.Scene {
     this.passenger = new Passenger(this,14,9,'passengersprite');
     this.trainArray[0] = new Train(this, 14, 14, 'trainsprite', TRAIN_SPEED);
     this.trainArray[1] = new Train(this, 14, 15, 'trainsprite', TRAIN_SPEED);
-    this.physics.add.collider(this.trainArray[0],this.backgroundLayer);
+
+    this.trainsGroup.add(this.trainArray[0]);
+    this.trainsGroup.add(this.trainArray[1]);
+    // this.physics.add.overlap(this.trainArray[0],this.railsGroup);
+    this.physics.add.collider(this.trainsGroup,this.backgroundLayer);
     // new CurvedRail(this, 10, 10, 'curvedrailsprite', this.input.activePointer, 0);
 
 
@@ -93,13 +108,26 @@ export default class Game extends Phaser.Scene {
       }
 
       this.railPool[i] = new CurvedRail(this, i % 4, 9, 'curvedrailsprite', this.input.activePointer, dir1, dir2);
-      console.log(this.railPool[i].ReturnTile());
-      console.log(this.railPool[i].ReturnOrientation());
+      this.railsGroup.add(this.railPool[i]);
+      // console.log(this.railPool[i].ReturnTile());
+      // console.log(this.railPool[i].ReturnOrientation());
     }
   }
 
   update()
   {
+    this.physics.overlap(this.trainsGroup,this.railsGroup,(o1, o2) => {
+      console.log(o2.ReturnRailType());
+      if(o1.Compatible(o2)){
+
+      }
+      else this.scene.pause();
+
+
+
+
+      // o1 y o2 se están tocando
+  });
     if (this.state == stateEnum.ONTRACK)
     {
       this.updateMatrix(this.gameMatrix);
@@ -162,11 +190,11 @@ export default class Game extends Phaser.Scene {
     let tileObject = this.gameMatrix[trainTile.column][trainTile.row].object;
     let tileDirection = {First: this.gameMatrix[trainTile.column][trainTile.row].direction1, Second: this.gameMatrix[trainTile.column][trainTile.row].direction2};
 
-    if(tileObject == matrixEnum.RAIL && pos.x == trainTile.column * 50 + 25 && pos.y <= trainTile.row * 50 + 25)
+    if(tileObject == matrixEnum.RAIL && pos.x == trainTile.column * 50 + 25 && pos.y == trainTile.row * 50 + 25)
     {
       if (dir == -tileDirection.First) this.trainArray[i].ChangeDirection(tileDirection.Second);
       else if (dir == -tileDirection.Second) this.trainArray[i].ChangeDirection(tileDirection.First);
-      else this.changeState(stateEnum.CRASHED);
+      // else this.changeState(stateEnum.CRASHED);
       console.log(trainTile);
     }
     else if(tileObject == matrixEnum.PASSENGER) this.passenger.destroy();
