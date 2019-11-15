@@ -45,8 +45,8 @@ export default class Train extends Phaser.Physics.Arcade.Sprite
         
 
     }
+    //dado un rail comprueba todos los casos de entrada que no son compatibles y la direccion que va a tomar tras cruzarlo, en caso de que sea compatible
     Compatible(rail){
-        console.log(this.direction);
         let offset = 10;
         switch(this.direction){
             case directionEnum.UP:
@@ -80,18 +80,6 @@ export default class Train extends Phaser.Physics.Arcade.Sprite
         }
         return true;
 
-    }
-    ChangeDirection2(){
-        switch(this.direction){
-            case directionEnum.UP:
-                break;
-            case directionEnum.DOWN:
-                break;
-            case directionEnum.LEFT:
-                break;
-            case directionEnum.RIGHT:
-                break;
-        }
     }
 
     ChangeDirection(direction)

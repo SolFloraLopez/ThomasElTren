@@ -9,7 +9,6 @@ export default class CurvedRail extends Phaser.Physics.Arcade.Sprite
         scene.physics.add.existing(this);
         scene.input.setDraggable(this);
 
-
         scene.input.on('dragstart', function (pointer, gameObject, dragX, dragY) {
           gameObject.body.enable = false;
       });
