@@ -9,7 +9,7 @@ import {directionEnum, matrixEnum, stateEnum} from './Enums.js'
 const COLUMNS = 28;
 const ROWS = 16;
 const POOL_LENGTH = 100;
-const TRAIN_SPEED = 0.5;
+const TRAIN_SPEED = 50;
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -27,7 +27,7 @@ export default class Game extends Phaser.Scene {
     // this.load.image('fondosprite', 'img/fondo.png', {frameWidth: 1400, frameHeight: 800})
     // this.load.image('plantillasprite', 'img/Plantilla.png', {frameWidth: 1400, frameHeight: 800})
     this.load.tilemapTiledJSON('tilemap','./tilemap.json')
-    this.load.image('patronesTilemap','img/casilla.png')
+    this.load.image('patronesTilemap','img/terrain.png')
     this.load.image('railsprite', 'img/rail.png', {frameWidth: 32, frameHeight: 48})
     this.load.image('trainsprite', 'img/trainwagon.png', { frameWidth: 50, frameHeight: 50 })
 
@@ -44,19 +44,27 @@ export default class Game extends Phaser.Scene {
       tileWidth: 64,
       tileHeight: 64
     });
-    this.map.addTilesetImage('casilla','patronesTilemap');
-    this.backgroundLayer = this.map.createStaticLayer('Background','casilla');
-    
+    this.map.addTilesetImage('terrain','patronesTilemap');
+    this.backgroundLayer = this.map.createStaticLayer('Background','terrain');
+
+    this.backgroundLayer.setCollisionByProperty({collides: true});
+
+    const debugGraphics = this.add.graphics().setAlpha(0.75);
+     this.backgroundLayer.renderDebug(debugGraphics, {
+    tileColor: null, // Color of non-colliding tiles
+    collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
+    faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
+    });
     this.createMatrix(this.gameMatrix);
     console.log(this.gameMatrix[0][0].object);
 
     // this.add.sprite(700, 400, 'fondosprite');
     // this.plantilla = this.add.sprite(700, 400, 'plantillasprite');
-
+    this.passenger = new Passenger(this,14,9,'passengersprite');
     this.trainArray[0] = new Train(this, 14, 14, 'trainsprite', TRAIN_SPEED);
     this.trainArray[1] = new Train(this, 14, 15, 'trainsprite', TRAIN_SPEED);
-    this.passenger = new Passenger(this,14,9,'passengersprite');
-    new CurvedRail(this, 10, 10, 'curvedrailsprite', this.input.activePointer, 0);
+    this.physics.add.collider(this.trainArray[0],this.backgroundLayer);
+    // new CurvedRail(this, 10, 10, 'curvedrailsprite', this.input.activePointer, 0);
 
 
     for(let i = 0; i < POOL_LENGTH; i++)
@@ -154,7 +162,7 @@ export default class Game extends Phaser.Scene {
     let tileObject = this.gameMatrix[trainTile.column][trainTile.row].object;
     let tileDirection = {First: this.gameMatrix[trainTile.column][trainTile.row].direction1, Second: this.gameMatrix[trainTile.column][trainTile.row].direction2};
 
-    if(tileObject == matrixEnum.RAIL && pos.x == trainTile.column * 50 + 25 && pos.y == trainTile.row * 50 + 25)
+    if(tileObject == matrixEnum.RAIL && pos.x == trainTile.column * 50 + 25 && pos.y <= trainTile.row * 50 + 25)
     {
       if (dir == -tileDirection.First) this.trainArray[i].ChangeDirection(tileDirection.Second);
       else if (dir == -tileDirection.Second) this.trainArray[i].ChangeDirection(tileDirection.First);

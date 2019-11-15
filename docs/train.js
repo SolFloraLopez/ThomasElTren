@@ -1,11 +1,13 @@
 import {directionEnum, matrixEnum, stateEnum, } from './Enums.js'
 
-export default class Train extends Phaser.GameObjects.Sprite
+export default class Train extends Phaser.Physics.Arcade.Sprite
 { 
     constructor(scene, column, row, texture, speed)
     {
         super(scene, (column * 50) + 25, (row * 50) + 25, texture);
         scene.add.existing(this);
+        scene.physics.add.existing(this);
+        this.setCollideWorldBounds(true)
 
         this.column = column;
         this.row = row;
@@ -15,11 +17,11 @@ export default class Train extends Phaser.GameObjects.Sprite
         this.setDepth(1);
     }
 
-    preUpdate()
+    preUpdate(time,delta)
      {
         if (this.state == stateEnum.ONTRACK) 
         {
-            this.Move(this.speed);
+            this.Move(this.speed,time,delta);
             this.column = Math.floor(this.x / 50);
             this.row = Math.floor(this.y / 50);
         }
@@ -33,11 +35,12 @@ export default class Train extends Phaser.GameObjects.Sprite
         return pos;
      }
      
-    Move(amount)
+    Move(amount,time,delta)
     {
-        if(Math.abs(this.direction % 2 == 0)) this.y += amount * (this.direction / 2);
+        this.body.setVelocity(0);
+        if(Math.abs(this.direction % 2 == 0))this.body.setVelocityY(10 * delta *-1)
+        else this.body.setVelocityX(amount * this.direction);
 
-        else this.x += amount * this.direction;
     }
 
     ChangeDirection(direction)
