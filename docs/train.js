@@ -26,7 +26,6 @@ export default class Train extends Phaser.Physics.Arcade.Sprite
             this.column = Math.floor(this.x / 50);
             this.row = Math.floor(this.y / 50);
         }
-        
         //console.table([{name: 'column', amount: this.column}, {name: 'row', amount: this.row}, {name: 'x', amount: this.x}, {name: 'y', amount: this.y}]);
     }
 
@@ -39,29 +38,47 @@ export default class Train extends Phaser.Physics.Arcade.Sprite
     Move(amount,time,delta)
     {
         this.body.setVelocity(0);
-        if(this.direction!=directionEnum.NONE){
-            if(Math.abs(this.direction % 2 == 0))this.body.setVelocityY(10 * delta *-1)
-            else this.body.setVelocityX(10 * delta *-1);
+        if(this.direction!==directionEnum.NONE){
+            if(this.direction===directionEnum.UP || this.direction===directionEnum.DOWN)this.body.setVelocityY(10 * delta *this.direction/2)
+            else this.body.setVelocityX(10 * delta *this.direction);
         }
         
 
     }
     Compatible(rail){
-        let compatible = true;
+        console.log(this.direction);
+        let offset = 10;
         switch(this.direction){
             case directionEnum.UP:
-                if((rail.ReturnRailType()===0 || rail.ReturnRailType()===1) && this.y>rail.ReturnPos().y)compatible = false;
+                if((rail.ReturnRailType()===0 || rail.ReturnRailType()===1) && this.y>rail.ReturnPos().y+offset)return false;
+                else if(this.y<rail.ReturnPos().y){
+                    if(rail.ReturnRailType()===2)this.ChangeDirection(directionEnum.LEFT);
+                    else if(rail.ReturnRailType()===3)this.ChangeDirection(directionEnum.RIGHT);
+                } 
                 break;
             case directionEnum.DOWN:
+                if((rail.ReturnRailType()===2 || rail.ReturnRailType()===3) && this.y<rail.ReturnPos().y-offset)return false;
+                else if(this.y>rail.ReturnPos().y){
+                    if(rail.ReturnRailType()===0)this.ChangeDirection(directionEnum.LEFT);
+                    else if(rail.ReturnRailType()===1)this.ChangeDirection(directionEnum.RIGHT);
+                } 
                 break;
             case directionEnum.LEFT:
+                    if((rail.ReturnRailType()===0 || rail.ReturnRailType()===2) && this.x>rail.ReturnPos().x+offset)return false;
+                    else if(this.x<rail.ReturnPos().x){
+                        if(rail.ReturnRailType()===1)this.ChangeDirection(directionEnum.UP);
+                        else if(rail.ReturnRailType()===3)this.ChangeDirection(directionEnum.DOWN);
+                    } 
                 break;
             case directionEnum.RIGHT:
+                     if((rail.ReturnRailType()===1 || rail.ReturnRailType()===3) && this.x<rail.ReturnPos().x-offset)return false;
+                     else if(this.x>rail.ReturnPos().x){
+                        if(rail.ReturnRailType()===0)this.ChangeDirection(directionEnum.UP);
+                        else if(rail.ReturnRailType()===2)this.ChangeDirection(directionEnum.DOWN);
+                    } 
                 break;
         }
-        return compatible;
-        
-
+        return true;
 
     }
     ChangeDirection2(){

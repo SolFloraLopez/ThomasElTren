@@ -2,7 +2,7 @@ import {directionEnum, matrixEnum, stateEnum} from './Enums.js'
 
 export default class CurvedRail extends Phaser.Physics.Arcade.Sprite
 {
-    constructor(scene, column, row, texture, pointer, orientation1, orientation2)
+    constructor(scene, column, row, texture, pointer, /*orientation1, orientation2,*/railType)
     {
         super(scene, (column * 50) + 25, (row * 50) + 25, texture);
         scene.add.existing(this).setInteractive();
@@ -23,29 +23,41 @@ export default class CurvedRail extends Phaser.Physics.Arcade.Sprite
         
         this.column = column;
         this.row = row;
-        this.orientation1 = orientation1;
-        this.orientation2 = orientation2;
+        // this.orientation1 = orientation1;
+        // this.orientation2 = orientation2;
+        this.railType = railType;
         this.selected = false;
         this.pointer = pointer;
         this.state = stateEnum.ONTRACK;
 
-        switch (orientation1 + orientation2)
+      //   switch (orientation1 + orientation2)
+      // {
+      //   case -3:
+      //     this.angle = 180;
+      //     break;
+      //   case -1:
+      //     this.angle = 270;
+      //     break;
+      //   case 1:
+      //     this.angle = 90; 
+      //     break;
+      //   case 3:
+      //     this.angle = 0;
+      //     break;
+      // }
+      switch (this.railType)
       {
-        case -3:
+        case 0:
           this.angle = 180;
-          this.railType = 0;
-          break;
-        case -1:
-          this.angle = 270;
-          this.railType = 1;
           break;
         case 1:
+          this.angle = 270;
+          break;
+        case 2:
           this.angle = 90; 
-          this.railType = 2;
           break;
         case 3:
           this.angle = 0;
-          this.railType = 3;
           break;
       }
     }

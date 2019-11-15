@@ -59,8 +59,11 @@ export default class Game extends Phaser.Scene {
 
     this.railsGroup = this.physics.add.group();
     this.trainsGroup = this.physics.add.group();
-
+    this.passengersGroup = this.physics.add.group();
     
+
+
+
 
 
 
@@ -75,9 +78,15 @@ export default class Game extends Phaser.Scene {
     this.trainArray[0] = new Train(this, 14, 14, 'trainsprite', TRAIN_SPEED);
     this.trainArray[1] = new Train(this, 14, 15, 'trainsprite', TRAIN_SPEED);
 
+    this.passengersGroup.add(this.passenger);
+
     this.trainsGroup.add(this.trainArray[0]);
     this.trainsGroup.add(this.trainArray[1]);
     // this.physics.add.overlap(this.trainArray[0],this.railsGroup);
+    this.physics.add.collider(this.trainArray[0], this.passengersGroup, (o1, o2) => {
+      o2.destroy();
+      // hacer algo
+  });
     this.physics.add.collider(this.trainsGroup,this.backgroundLayer);
     // new CurvedRail(this, 10, 10, 'curvedrailsprite', this.input.activePointer, 0);
 
@@ -86,28 +95,29 @@ export default class Game extends Phaser.Scene {
     {
       let dir1;
       let dir2;
+      let railType = i%4;
 
-      switch (i % 4)
-      {
-        case 0:
-          dir1 = directionEnum.UP;
-          dir2 = directionEnum.LEFT;
-          break;
-        case 1:
-          dir1 = directionEnum.UP;
-          dir2 = directionEnum.RIGHT;
-          break;
-        case 2:
-          dir1 = directionEnum.DOWN;
-          dir2 = directionEnum.LEFT;
-          break;
-        case 3:
-          dir1 = directionEnum.DOWN;
-          dir2 = directionEnum.RIGHT;
-          break;
-      }
+      // switch (i % 4)
+      // {
+      //   case 0:
+      //     dir1 = directionEnum.UP;
+      //     dir2 = directionEnum.LEFT;
+      //     break;
+      //   case 1:
+      //     dir1 = directionEnum.UP;
+      //     dir2 = directionEnum.RIGHT;
+      //     break;
+      //   case 2:
+      //     dir1 = directionEnum.DOWN;
+      //     dir2 = directionEnum.LEFT;
+      //     break;
+      //   case 3:
+      //     dir1 = directionEnum.DOWN;
+      //     dir2 = directionEnum.RIGHT;
+      //     break;
+      // }
 
-      this.railPool[i] = new CurvedRail(this, i % 4, 9, 'curvedrailsprite', this.input.activePointer, dir1, dir2);
+      this.railPool[i] = new CurvedRail(this, i % 4, 9, 'curvedrailsprite', this.input.activePointer, /*dir1, dir2*/railType);
       this.railsGroup.add(this.railPool[i]);
       // console.log(this.railPool[i].ReturnTile());
       // console.log(this.railPool[i].ReturnOrientation());
@@ -117,14 +127,12 @@ export default class Game extends Phaser.Scene {
   update()
   {
     this.physics.overlap(this.trainsGroup,this.railsGroup,(o1, o2) => {
+      if(o2)
       console.log(o2.ReturnRailType());
       if(o1.Compatible(o2)){
 
       }
       else this.scene.pause();
-
-
-
 
       // o1 y o2 se están tocando
   });
@@ -175,8 +183,6 @@ export default class Game extends Phaser.Scene {
 
           k++;
         }
-        let passengerTile = this.passenger.ReturnTile();
-        if (passengerTile.column == i && passengerTile.row == j) this.gameMatrix[i][j] = {object: matrixEnum.PASSENGER, direction: directionEnum.NONE}
       }
     }
 
@@ -192,12 +198,11 @@ export default class Game extends Phaser.Scene {
 
     if(tileObject == matrixEnum.RAIL && pos.x == trainTile.column * 50 + 25 && pos.y == trainTile.row * 50 + 25)
     {
-      if (dir == -tileDirection.First) this.trainArray[i].ChangeDirection(tileDirection.Second);
-      else if (dir == -tileDirection.Second) this.trainArray[i].ChangeDirection(tileDirection.First);
+      // if (dir == -tileDirection.First) this.trainArray[i].ChangeDirection(tileDirection.Second);
+      // else if (dir == -tileDirection.Second) this.trainArray[i].ChangeDirection(tileDirection.First);
       // else this.changeState(stateEnum.CRASHED);
       console.log(trainTile);
     }
-    else if(tileObject == matrixEnum.PASSENGER) this.passenger.destroy();
   }
 
   changeState(state)
