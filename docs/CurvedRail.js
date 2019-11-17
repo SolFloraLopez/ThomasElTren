@@ -2,9 +2,9 @@ import {directionEnum, matrixEnum, stateEnum} from './Enums.js'
 
 export default class CurvedRail extends Phaser.Physics.Arcade.Sprite
 {
-    constructor(scene, column, row, texture, pointer, /*orientation1, orientation2,*/railType)
+    constructor(scene, column, row, texture, pointer, railType, tileSize)
     {
-        super(scene, (column * 50) + 25, (row * 50) + 25, texture);
+        super(scene, (column * tileSize) + tileSize / 2, (row * tileSize) + tileSize / 2, texture);
         scene.add.existing(this).setInteractive();
         scene.physics.add.existing(this);
         scene.input.setDraggable(this);
@@ -20,30 +20,14 @@ export default class CurvedRail extends Phaser.Physics.Arcade.Sprite
           gameObject.body.enable = true;
       });
         
+        this.tileSize = tileSize;
         this.column = column;
         this.row = row;
-        // this.orientation1 = orientation1;
-        // this.orientation2 = orientation2;
         this.railType = railType;
         this.selected = false;
         this.pointer = pointer;
         this.state = stateEnum.ONTRACK;
 
-      //   switch (orientation1 + orientation2)
-      // {
-      //   case -3:
-      //     this.angle = 180;
-      //     break;
-      //   case -1:
-      //     this.angle = 270;
-      //     break;
-      //   case 1:
-      //     this.angle = 90; 
-      //     break;
-      //   case 3:
-      //     this.angle = 0;
-      //     break;
-      // }
       switch (this.railType)
       {
         case 0:
@@ -67,10 +51,10 @@ export default class CurvedRail extends Phaser.Physics.Arcade.Sprite
         {
             if(!this.pointer.isDown)
             {       
-                this.column = Math.floor(this.x / 50);
-                this.row = Math.floor(this.y / 50);
-                this.x = (this.column * 50) + 25;
-                this.y = (this.row * 50) + 25;
+                this.column = Math.floor(this.x / this.tileSize);
+                this.row = Math.floor(this.y / this.tileSize);
+                this.x = (this.column * this.tileSize) + this.tileSize / 2;
+                this.y = (this.row * this.tileSize) + this.tileSize / 2;
             }
         }
     }
@@ -92,14 +76,19 @@ export default class CurvedRail extends Phaser.Physics.Arcade.Sprite
     {
         this.state = state;
     }
-    ReturnRailType(){
+
+    ReturnRailType()
+    {
       return this.railType;
     }
-    ReturnPos(){
+
+    ReturnPos()
+    {
       let pos = {x: this.x,  y: this.y};
       return pos;
-   }
-   OnDrag(dragging){
+    }
+
+    OnDrag(dragging){
      console.log(dragging);
      return dragging;
    }

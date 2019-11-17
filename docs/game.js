@@ -5,7 +5,7 @@ import Passenger, * as passenger from './passenger.js'
 import CurvedRail, * as curvedRail from './CurvedRail.js'
 import {directionEnum, matrixEnum, stateEnum} from './Enums.js'
 
-
+const TILE_SIZE = 50;
 const COLUMNS = 28;
 const ROWS = 16;
 const POOL_LENGTH = 100;
@@ -24,8 +24,6 @@ export default class Game extends Phaser.Scene {
 
   preload()
   {
-    // this.load.image('fondosprite', 'img/fondo.png', {frameWidth: 1400, frameHeight: 800})
-    // this.load.image('plantillasprite', 'img/Plantilla.png', {frameWidth: 1400, frameHeight: 800})
     this.load.tilemapTiledJSON('tilemap','./tilemap.json')
     this.load.image('patronesTilemap','img/terrain.png')
     this.load.image('railsprite', 'img/rail.png', {frameWidth: 32, frameHeight: 48})
@@ -64,16 +62,16 @@ export default class Game extends Phaser.Scene {
     this.passengersGroup = this.physics.add.group();
 
     
-    this.createMatrix(this.gameMatrix);
-    console.log(this.gameMatrix[0][0].object);
+    // this.createMatrix(this.gameMatrix);
+    // console.log(this.gameMatrix[0][0].object);
 
     // this.add.sprite(700, 400, 'fondosprite');
     // this.plantilla = this.add.sprite(700, 400, 'plantillasprite');
 
     //crea las entidades (los pasajeros seran un array tambien)
-    this.passenger = new Passenger(this,14,9,'passengersprite');
-    this.trainArray[0] = new Train(this, 14, 14, 'trainsprite', TRAIN_SPEED);
-    this.trainArray[1] = new Train(this, 14, 15, 'trainsprite', TRAIN_SPEED);
+    this.passenger = new Passenger(this, 14, 9, 'passengersprite');
+    this.trainArray[0] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 14 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', TRAIN_SPEED, directionEnum.UP);
+    this.trainArray[1] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 15 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', TRAIN_SPEED, directionEnum.UP);
 
     //se añaden a los grupos de colisiones
     this.passengersGroup.add(this.passenger);
@@ -85,6 +83,7 @@ export default class Game extends Phaser.Scene {
     //creacion de colisiones entre entidades y callbacks
     this.physics.add.collider(this.trainsGroup, this.passengersGroup, (o1, o2) => {
       o2.destroy();
+      this.createNewTrain();
   });
     this.physics.add.collider(this.trainsGroup,this.backgroundLayer, () => {
       this.scene.pause();
@@ -94,33 +93,10 @@ export default class Game extends Phaser.Scene {
 
     for(let i = 0; i < POOL_LENGTH; i++)
     {
-      // let dir1;
-      // let dir2;
-
       //el tipo de rail definira su angulo
-      let railType = i%4;
+      let railType = i % 4;
 
-      // switch (i % 4)
-      // {
-      //   case 0:
-      //     dir1 = directionEnum.UP;
-      //     dir2 = directionEnum.LEFT;
-      //     break;
-      //   case 1:
-      //     dir1 = directionEnum.UP;
-      //     dir2 = directionEnum.RIGHT;
-      //     break;
-      //   case 2:
-      //     dir1 = directionEnum.DOWN;
-      //     dir2 = directionEnum.LEFT;
-      //     break;
-      //   case 3:
-      //     dir1 = directionEnum.DOWN;
-      //     dir2 = directionEnum.RIGHT;
-      //     break;
-      // }
-
-      this.railPool[i] = new CurvedRail(this, i % 4, 9, 'curvedrailsprite', this.input.activePointer, /*dir1, dir2*/railType);
+      this.railPool[i] = new CurvedRail(this, i % 4, 9, 'curvedrailsprite', this.input.activePointer, railType, TILE_SIZE);
       //ademas de crearlos se añaden al grupo de colisiones
       this.railsGroup.add(this.railPool[i]);
 
@@ -137,25 +113,16 @@ export default class Game extends Phaser.Scene {
     this.physics.overlap(this.trainsGroup,this.railsGroup,(o1, o2) => {
       console.log(o2.ReturnRailType());
       //comprueba si el rail es compatible con el tren, es decir, si puede entrar por ese lado del rail
-      if(o1.Compatible(o2)){
-
-      }
-      else this.scene.pause();
+      if(!o1.Compatible(o2)) this.scene.pause();
   });
 
 
     if (this.state == stateEnum.ONTRACK)
     {
-      this.updateMatrix(this.gameMatrix);
-
-      for (let i = 0; i < this.trainArray.length; i++)
-      {
-        this.checkTrain(i);
-      }
     }
   }
 
-  createMatrix(matrix) {
+  /*createMatrix(matrix) {
 
     for (let i = 0; i < COLUMNS; i++)
     {
@@ -165,51 +132,19 @@ export default class Game extends Phaser.Scene {
         matrix[i][j] = {object: matrixEnum.EMPTY, direction1: directionEnum.NONE, direction2: directionEnum.NONE};
       }
     }
-  }
+  }*/
 
-  updateMatrix()
+  createNewTrain()
   {
-    for (let i = 0; i < COLUMNS; i++)
-    {
-      for (let j = 0; j < ROWS; j++)
-      {
-        let k = 0;
-        let flag = false;
+    let tailDir = this.trainArray[this.trainArray.length - 1].ReturnDirection();
+    let tailPos = this.trainArray[this.trainArray.length - 1].ReturnPos();
+    let trainPos;
 
-        while(k < POOL_LENGTH && !flag)
-        {
-          let railTile = this.railPool[k].ReturnTile();
+    if (Math.abs(tailDir) == 2) trainPos = { x: tailPos.x, y: tailPos.y - TILE_SIZE * tailDir / 2};
+    else trainPos = { x: tailPos.x - TILE_SIZE * tailDir, y: tailPos.y};
 
-          if(railTile.column != i || railTile.row != j) this.gameMatrix[i][j] = {object: matrixEnum.EMPTY, direction1: directionEnum.NONE, direction2: directionEnum.NONE}
-
-           else
-          {
-            let orientation = this.railPool[k].ReturnOrientation();
-            this.gameMatrix[i][j] = {object: matrixEnum.RAIL, direction1: orientation.First, direction2: orientation.Second }
-            flag = true;
-          }
-
-          k++;
-        }
-      }
-    }
-
-  }
-
-  checkTrain(i)
-  {
-    let pos = this.trainArray[i].ReturnPos();
-    let trainTile = this.trainArray[i].ReturnTile();
-    let dir = this.trainArray[i].ReturnDirection();
-    let tileObject = this.gameMatrix[trainTile.column][trainTile.row].object;
-    let tileDirection = {First: this.gameMatrix[trainTile.column][trainTile.row].direction1, Second: this.gameMatrix[trainTile.column][trainTile.row].direction2};
-
-    if(tileObject == matrixEnum.RAIL && pos.x == trainTile.column * 50 + 25 && pos.y == trainTile.row * 50 + 25)
-    {
-      // if (dir == -tileDirection.First) this.trainArray[i].ChangeDirection(tileDirection.Second);
-      // else if (dir == -tileDirection.Second) this.trainArray[i].ChangeDirection(tileDirection.First);
-      // else this.changeState(stateEnum.CRASHED);
-    }
+    this.trainArray[this.trainArray.length] = new Train(this, trainPos.x, trainPos.y, 'trainsprite', TRAIN_SPEED, tailDir);
+    this.trainsGroup.add(this.trainArray[this.trainArray.length - 1]);
   }
 
   // changeState(state)
