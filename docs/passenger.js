@@ -1,4 +1,4 @@
-import {directionEnum, matrixEnum} from './Enums.js'
+ import {directionEnum, matrixEnum} from './Enums.js'
 
 export default class Passenger extends Phaser.Physics.Arcade.Sprite{
     constructor(scene, column, row, texture)
@@ -9,7 +9,6 @@ export default class Passenger extends Phaser.Physics.Arcade.Sprite{
         this.body.setSize(10,10);
         this.column = column;
         this.row = row;
-        this.direction = directionEnum.UP;
         this.setDepth(1);
     }
     
@@ -22,5 +21,11 @@ export default class Passenger extends Phaser.Physics.Arcade.Sprite{
     {
         let tile = {column: this.column, row: this.row}
         return tile;
+    }
+
+    MoveToTile(tile)
+    {
+        this.x = tile.column * 50 + 25;
+        this.y = tile.row * 50 + 25;
     }
 }

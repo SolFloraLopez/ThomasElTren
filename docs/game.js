@@ -50,7 +50,7 @@ export default class Game extends Phaser.Scene {
 
     //para ver la caja de colisiones del layer
     const debugGraphics = this.add.graphics().setAlpha(0.75);
-     this.backgroundLayer.renderDebug(debugGraphics, {
+    this.backgroundLayer.renderDebug(debugGraphics, {
     tileColor: null, // Color of non-colliding tiles
     collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
     faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
@@ -84,10 +84,15 @@ export default class Game extends Phaser.Scene {
     this.physics.add.collider(this.trainsGroup, this.passengersGroup, (o1, o2) => {
       o2.destroy();
       this.createNewTrain();
-  });
-    this.physics.add.collider(this.trainsGroup,this.backgroundLayer, () => {
+      this.createPassenger();
+    });
+    this.physics.add.collider(this.passengersGroup, this.backgroundLayer, () => {
+      o2.destroy();
+      this.createPassenger();
+    });
+    this.physics.add.collider(this.trainsGroup, this.backgroundLayer, () => {
       this.scene.pause();
-  });
+    });
     // new CurvedRail(this, 10, 10, 'curvedrailsprite', this.input.activePointer, 0);
 
 
@@ -145,6 +150,13 @@ export default class Game extends Phaser.Scene {
 
     this.trainArray[this.trainArray.length] = new Train(this, trainPos.x, trainPos.y, 'trainsprite', TRAIN_SPEED, tailDir);
     this.trainsGroup.add(this.trainArray[this.trainArray.length - 1]);
+  }
+
+  createPassenger()
+  {
+    let tile = {column: Math.floor(Math.random() * COLUMNS), row: Math.floor(Math.random() * ROWS)};
+    this.passenger = new Passenger(this, tile.column, tile.row, 'passengersprite');
+    this.passengersGroup.add(this.passenger);
   }
 
   // changeState(state)
