@@ -9,7 +9,8 @@ const TILE_SIZE = 50;
 const COLUMNS = 28;
 const ROWS = 16;
 const POOL_LENGTH = 100;
-const TRAIN_SPEED = 10;
+const INITIAL_TRAIN_SPEED = 2;
+const SPEED_INCREASE = 2;
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -17,6 +18,7 @@ export default class Game extends Phaser.Scene {
 
     this.points = 0;
     this.state = stateEnum.ONTRACK;
+    this.currentSpeed = INITIAL_TRAIN_SPEED;
     this.railPool = [];
     this.trainArray = [];
     this.gameMatrix = [];
@@ -70,8 +72,8 @@ export default class Game extends Phaser.Scene {
 
     //crea las entidades (los pasajeros seran un array tambien)
     this.passenger = new Passenger(this, 14, 9, 'passengersprite');
-    this.trainArray[0] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 14 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', TRAIN_SPEED, directionEnum.UP);
-    this.trainArray[1] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 15 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', TRAIN_SPEED, directionEnum.UP);
+    this.trainArray[0] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 14 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
+    this.trainArray[1] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 15 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
 
     //se añaden a los grupos de colisiones
     this.passengersGroup.add(this.passenger);
@@ -85,6 +87,8 @@ export default class Game extends Phaser.Scene {
       o2.destroy();
       this.createNewTrain();
       this.createPassenger();
+      this.currentSpeed += SPEED_INCREASE;
+      this.changeTrainSpeed();
     });
     this.physics.add.collider(this.passengersGroup, this.backgroundLayer, () => {
       o2.destroy();
@@ -148,7 +152,7 @@ export default class Game extends Phaser.Scene {
     if (Math.abs(tailDir) == 2) trainPos = { x: tailPos.x, y: tailPos.y - TILE_SIZE * tailDir / 2};
     else trainPos = { x: tailPos.x - TILE_SIZE * tailDir, y: tailPos.y};
 
-    this.trainArray[this.trainArray.length] = new Train(this, trainPos.x, trainPos.y, 'trainsprite', TRAIN_SPEED, tailDir);
+    this.trainArray[this.trainArray.length] = new Train(this, trainPos.x, trainPos.y, 'trainsprite', INITIAL_TRAIN_SPEED, tailDir);
     this.trainsGroup.add(this.trainArray[this.trainArray.length - 1]);
   }
 
@@ -157,6 +161,14 @@ export default class Game extends Phaser.Scene {
     let tile = {column: Math.floor(Math.random() * COLUMNS), row: Math.floor(Math.random() * ROWS)};
     this.passenger = new Passenger(this, tile.column, tile.row, 'passengersprite');
     this.passengersGroup.add(this.passenger);
+  }
+
+  changeTrainSpeed()
+  {
+    for(let i = 0; i < this.trainArray.length; i++)
+    {
+      this.trainArray[i].ChangeSpeed(this.currentSpeed);
+    }
   }
 
   // changeState(state)

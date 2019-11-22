@@ -110,5 +110,10 @@ export default class Train extends Phaser.Physics.Arcade.Sprite
     {
         this.state = state;
     }
+
+    ChangeSpeed(amount)
+    {
+        this.speed = amount;
+    }
 }
 
