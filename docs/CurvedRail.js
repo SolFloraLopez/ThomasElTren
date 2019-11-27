@@ -9,8 +9,10 @@ export default class CurvedRail extends Phaser.Physics.Arcade.Sprite
         scene.physics.add.existing(this);
         scene.input.setDraggable(this);
 
+
         scene.input.on('dragstart', function (pointer, gameObject, dragX, dragY) {
           gameObject.body.enable = false;
+          gameObject.rotatable = true;
       });
         scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
             gameObject.x = dragX;
@@ -18,8 +20,9 @@ export default class CurvedRail extends Phaser.Physics.Arcade.Sprite
         });
         scene.input.on('dragend', function (pointer, gameObject, dragX, dragY) {
           gameObject.body.enable = true;
+          gameObject.rotatable = false;
       });
-        
+
         this.tileSize = tileSize;
         this.column = column;
         this.row = row;
@@ -27,26 +30,28 @@ export default class CurvedRail extends Phaser.Physics.Arcade.Sprite
         this.selected = false;
         this.pointer = pointer;
         this.state = stateEnum.ONTRACK;
+        this.rotatable = false;
 
       switch (this.railType)
       {
         case 0:
-          this.angle = 180;
+          this.angle = 0;
           break;
         case 1:
-          this.angle = 270;
+          this.angle = 90;
           break;
         case 2:
-          this.angle = 90; 
+          this.angle = 180; 
           break;
         case 3:
-          this.angle = 0;
+          this.angle = 270;
           break;
       }
     }
 
     preUpdate()
     {
+
         if (this.state == stateEnum.ONTRACK)
         {
             if(!this.pointer.isDown)
@@ -57,6 +62,15 @@ export default class CurvedRail extends Phaser.Physics.Arcade.Sprite
                 this.y = (this.row * this.tileSize) + this.tileSize / 2;
             }
         }
+        if(this.pointer.isDown && this.rotatable)
+            {       
+            if (Phaser.Input.Keyboard.JustDown(this.scene.r)) {
+            this.angle += 90;
+            this.railType = (this.railType + 1)%4;
+          }
+         }
+
+      
     }
 
     ReturnTile()
@@ -88,8 +102,4 @@ export default class CurvedRail extends Phaser.Physics.Arcade.Sprite
       return pos;
     }
 
-    OnDrag(dragging){
-     console.log(dragging);
-     return dragging;
-   }
 }

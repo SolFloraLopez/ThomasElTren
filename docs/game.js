@@ -44,6 +44,8 @@ export default class Game extends Phaser.Scene {
       tileWidth: 64,
       tileHeight: 64
     });
+    this.r = this.input.keyboard.addKey('R');
+
     this.map.addTilesetImage('terrain','patronesTilemap');
     //crea capa con tileset "terrain"
     this.backgroundLayer = this.map.createStaticLayer('Background','terrain');
@@ -63,7 +65,6 @@ export default class Game extends Phaser.Scene {
     this.trainsGroup = this.physics.add.group();
     this.passengersGroup = this.physics.add.group();
 
-    
     // this.createMatrix(this.gameMatrix);
     // console.log(this.gameMatrix[0][0].object);
 
@@ -120,7 +121,6 @@ export default class Game extends Phaser.Scene {
     //y abarcar todos los casos en Compatible();
     //si se superponen trenes y railes
     this.physics.overlap(this.trainsGroup,this.railsGroup,(o1, o2) => {
-      console.log(o2.ReturnRailType());
       //comprueba si el rail es compatible con el tren, es decir, si puede entrar por ese lado del rail
       if(!o1.Compatible(o2)) this.scene.pause();
   });
