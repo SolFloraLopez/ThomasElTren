@@ -1,8 +1,6 @@
 import Train, * as train from './train.js'
-
 import Rail, * as rail from './Rail.js'
 import Passenger, * as passenger from './passenger.js'
-import CurvedRail, * as curvedRail from './CurvedRail.js'
 import {directionEnum, matrixEnum, stateEnum} from './Enums.js'
 
 const TILE_SIZE = 50;
@@ -65,12 +63,6 @@ export default class Game extends Phaser.Scene {
     this.trainsGroup = this.physics.add.group();
     this.passengersGroup = this.physics.add.group();
 
-    // this.createMatrix(this.gameMatrix);
-    // console.log(this.gameMatrix[0][0].object);
-
-    // this.add.sprite(700, 400, 'fondosprite');
-    // this.plantilla = this.add.sprite(700, 400, 'plantillasprite');
-
     //crea las entidades (los pasajeros seran un array tambien)
     this.passenger = new Passenger(this, 14, 9, 'passengersprite');
     this.trainArray[0] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 14 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
@@ -98,15 +90,17 @@ export default class Game extends Phaser.Scene {
     this.physics.add.collider(this.trainsGroup, this.backgroundLayer, () => {
       this.scene.pause();
     });
-    // new CurvedRail(this, 10, 10, 'curvedrailsprite', this.input.activePointer, 0);
+    // new Rail(this, 10, 10, 'Railsprite', this.input.activePointer, 0);
 
 
     for(let i = 0; i < POOL_LENGTH; i++)
     {
       //el tipo de rail definira su angulo
-      let railType = i % 4;
-
-      this.railPool[i] = new CurvedRail(this, i % 4, 9, 'curvedrailsprite', this.input.activePointer, railType, TILE_SIZE);
+      let railType = 4 * (i % 2);
+      
+      if (railType == 0) this.railPool[i] = new Rail(this, 0, 9, 'curvedrailsprite', this.input.activePointer, railType, TILE_SIZE);
+      else this.railPool[i] = new Rail(this, 1, 9, 'railsprite', this.input.activePointer, railType, TILE_SIZE);
+      
       //ademas de crearlos se añaden al grupo de colisiones
       this.railsGroup.add(this.railPool[i]);
 
@@ -130,18 +124,6 @@ export default class Game extends Phaser.Scene {
     {
     }
   }
-
-  /*createMatrix(matrix) {
-
-    for (let i = 0; i < COLUMNS; i++)
-    {
-      matrix[i] = [];
-      for (let j = 0; j < ROWS; j++)
-      {
-        matrix[i][j] = {object: matrixEnum.EMPTY, direction1: directionEnum.NONE, direction2: directionEnum.NONE};
-      }
-    }
-  }*/
 
   createNewTrain()
   {

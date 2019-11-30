@@ -50,29 +50,29 @@ export default class Train extends Phaser.Physics.Arcade.Sprite
         switch(this.direction){
 
             case directionEnum.UP:
-                if((railType === 2 || railType === 3) && this.y > rail.ReturnPos().y + offset) return false;
-                else if(this.y<rail.ReturnPos().y){
+                if((railType === 2 || railType === 3 || railType === 5) && this.y > rail.ReturnPos().y + offset) return false;
+                else if(railType !== 4 && this.y<rail.ReturnPos().y){
                     if(railType === 1) this.ChangeDirection(directionEnum.LEFT);
                     else if(railType === 0)this.ChangeDirection(directionEnum.RIGHT);
                 } 
                 break;
             case directionEnum.DOWN:
-                if((railType === 1 || railType === 0) && this.y < rail.ReturnPos().y - offset)return false;
-                else if(this.y > rail.ReturnPos().y){
+                if((railType === 1 || railType === 0 || railType === 5) && this.y < rail.ReturnPos().y - offset)return false;
+                else if(railType !== 4 && this.y > rail.ReturnPos().y){
                     if(railType === 2) this.ChangeDirection(directionEnum.LEFT);
                     else if(railType === 3) this.ChangeDirection(directionEnum.RIGHT);
                 } 
                 break;
             case directionEnum.LEFT:
-                    if((railType === 2 || railType === 1) && this.x > rail.ReturnPos().x + offset)return false;
-                    else if(this.x < rail.ReturnPos().x){
+                    if((railType === 2 || railType === 1 || railType === 4) && this.x > rail.ReturnPos().x + offset)return false;
+                    else if(railType !== 5 && this.x < rail.ReturnPos().x){
                         if(railType === 3)this.ChangeDirection(directionEnum.UP);
                         else if(railType === 0)this.ChangeDirection(directionEnum.DOWN);
                     } 
                 break;
             case directionEnum.RIGHT:
-                     if((railType === 3 || railType === 0) && this.x < rail.ReturnPos().x - offset)return false;
-                     else if(this.x > rail.ReturnPos().x){
+                     if((railType === 3 || railType === 0 || railType === 4) && this.x < rail.ReturnPos().x - offset)return false;
+                     else if(railType !== 5 && this.x > rail.ReturnPos().x){
                         if(railType === 2)this.ChangeDirection(directionEnum.UP);
                         else if(railType === 1)this.ChangeDirection(directionEnum.DOWN);
                     } 
