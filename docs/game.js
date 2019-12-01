@@ -13,8 +13,8 @@ const SPEED_INCREASE = 2;
 export default class Game extends Phaser.Scene {
   constructor() {
     super({ key: 'main' });
-
-    this.points = 0;
+    this.score = 0;
+    this.scoreText;
     this.state = stateEnum.ONTRACK;
     this.currentSpeed = INITIAL_TRAIN_SPEED;
     this.railPool = [];
@@ -37,6 +37,7 @@ export default class Game extends Phaser.Scene {
 
   create()
   {
+
     this.map = this.make.tilemap({
       key: 'tilemap',
       tileWidth: 64,
@@ -49,7 +50,9 @@ export default class Game extends Phaser.Scene {
     this.backgroundLayer = this.map.createStaticLayer('Background','terrain');
     //se añade colision a las partes que tengan atributo collides == true
     this.backgroundLayer.setCollisionByProperty({collides: true});
+    this.scoreText = this.add.text(1155, 10, 'Score: 0', { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' ,fontSize: '35px'});
 
+    
     //para ver la caja de colisiones del layer
     // const debugGraphics = this.add.graphics().setAlpha(0.75);
     // this.backgroundLayer.renderDebug(debugGraphics, {
@@ -81,6 +84,8 @@ export default class Game extends Phaser.Scene {
       this.createNewTrain();
       this.createPassenger();
       this.currentSpeed += SPEED_INCREASE;
+      this.score+=10;
+      this.scoreText.setText('Score: '+ this.score);
       this.changeTrainSpeed();
     });
     this.physics.add.collider(this.passengersGroup, this.backgroundLayer, () => {
@@ -107,6 +112,7 @@ export default class Game extends Phaser.Scene {
       // console.log(this.railPool[i].ReturnTile());
       // console.log(this.railPool[i].ReturnOrientation());
     }
+
   }
 
   update()
