@@ -1,18 +1,20 @@
 import Train, * as train from './train.js'
 import Rail, * as rail from './Rail.js'
 import Passenger, * as passenger from './passenger.js'
+import Inventory, * as inventory from './inventory.js'
 import {directionEnum, matrixEnum, stateEnum} from './Enums.js'
 
 const TILE_SIZE = 50;
 const COLUMNS = 28;
 const ROWS = 16;
-const POOL_LENGTH = 100;
-const INITIAL_TRAIN_SPEED = 2;
+const POOL_LENGTH = 12;
+const INITIAL_TRAIN_SPEED = 3;
 const SPEED_INCREASE = 2;
 
 export default class Game extends Phaser.Scene {
   constructor() {
     super({ key: 'main' });
+    this.inventory;
     this.score = 0;
     this.scoreText;
     this.state = stateEnum.ONTRACK;
@@ -43,6 +45,8 @@ export default class Game extends Phaser.Scene {
       tileWidth: 64,
       tileHeight: 64
     });
+
+
     this.r = this.input.keyboard.addKey('R');
 
     this.map.addTilesetImage('terrain','patronesTilemap');
@@ -50,8 +54,8 @@ export default class Game extends Phaser.Scene {
     this.backgroundLayer = this.map.createStaticLayer('Background','terrain');
     //se añade colision a las partes que tengan atributo collides == true
     this.backgroundLayer.setCollisionByProperty({collides: true});
-    this.scoreText = this.add.text(1155, 10, 'Score: 0', { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' ,fontSize: '35px'});
-
+    this.physics.world.setBounds(0, 0, 1400, 800);
+    this.scoreText = this.add.text(1155, 10, 'Puntos: 0', { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' ,fontSize: '35px'});
     
     //para ver la caja de colisiones del layer
     // const debugGraphics = this.add.graphics().setAlpha(0.75);
@@ -65,19 +69,18 @@ export default class Game extends Phaser.Scene {
     this.railsGroup = this.physics.add.group();
     this.trainsGroup = this.physics.add.group();
     this.passengersGroup = this.physics.add.group();
-
     //crea las entidades (los pasajeros seran un array tambien)
     this.passenger = new Passenger(this, 14, 9, 'passengersprite');
     this.trainArray[0] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 14 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
     this.trainArray[1] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 15 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
-
     //se añaden a los grupos de colisiones
     this.passengersGroup.add(this.passenger);
 
     this.trainsGroup.add(this.trainArray[0]);
+    this.trainArray[0].body.setCollideWorldBounds(true);
+    this.trainArray[0].body.onCollide = true;
     this.trainsGroup.add(this.trainArray[1]);
     // this.physics.add.overlap(this.trainArray[0],this.railsGroup);
-
     //creacion de colisiones entre entidades y callbacks
     this.physics.add.collider(this.trainsGroup, this.passengersGroup, (o1, o2) => {
       o2.destroy();
@@ -95,16 +98,28 @@ export default class Game extends Phaser.Scene {
     this.physics.add.collider(this.trainsGroup, this.backgroundLayer, () => {
       this.scene.pause();
     });
+  //   this.input.on('pointerdown', function (pointer) {
+  //     console.log(pointer.x);
+  //     this.scene.inventory.ModifyRailCounter(-1);
+  //     console.log("222");
+  // });
     // new Rail(this, 10, 10, 'Railsprite', this.input.activePointer, 0);
-
-
+    let curvedRailCount=0;
+    let straightRailCount=0;
+    this.inventory = new Inventory(this,POOL_LENGTH-1,curvedRailCount);
     for(let i = 0; i < POOL_LENGTH; i++)
     {
       //el tipo de rail definira su angulo
       let railType = 4 * (i % 2);
       
-      if (railType == 0) this.railPool[i] = new Rail(this, 24, 8, 'curvedrailsprite', this.input.activePointer, railType, TILE_SIZE);
-      else this.railPool[i] = new Rail(this, 26, 8, 'railsprite', this.input.activePointer, railType, TILE_SIZE);
+      if (railType == 0) {
+        this.railPool[i] = new Rail(this, 24, 8, 'curvedrailsprite', this.input.activePointer, railType, TILE_SIZE,this.inventory);
+        curvedRailCount++;
+      }
+      else {
+        this.railPool[i] = new Rail(this, 26, 8, 'railsprite', this.input.activePointer, railType, TILE_SIZE,this.inventory);
+        straightRailCount++;
+      }
       
       //ademas de crearlos se añaden al grupo de colisiones
       this.railsGroup.add(this.railPool[i]);
@@ -114,7 +129,6 @@ export default class Game extends Phaser.Scene {
     }
 
   }
-
   update()
   {
     //Nota: como ya no se puede comprobar la posición exacta del tren con el rail para cambiar la direccion (porque con las fisicas se salta frames) hay que poner un pequeño offset en las comprobaciones
@@ -130,7 +144,6 @@ export default class Game extends Phaser.Scene {
     {
     }
   }
-
   createNewTrain()
   {
     let tailDir = this.trainArray[this.trainArray.length - 1].ReturnDirection();
@@ -146,7 +159,7 @@ export default class Game extends Phaser.Scene {
 
   createPassenger()
   {
-    let tile = {column: Math.floor(Math.random() * COLUMNS), row: Math.floor(Math.random() * ROWS)};
+    let tile = {column: Math.floor(Math.random() * COLUMNS), row: Math.floor(Math.random() * ROWS-5)};
     this.passenger = new Passenger(this, tile.column, tile.row, 'passengersprite');
     this.passengersGroup.add(this.passenger);
   }
@@ -158,7 +171,34 @@ export default class Game extends Phaser.Scene {
       this.trainArray[i].ChangeSpeed(this.currentSpeed);
     }
   }
-
+  //si quedan 2 railes de un tipo en el inventario, genera nuevos.
+  CreateRail(){
+    let counters = this.CheckRails();
+    if(counters.curvedRails<=1){
+      let rail =  new Rail(this, 24, 8, 'curvedrailsprite', this.input.activePointer, 0, TILE_SIZE,this.inventory)
+      this.railPool[this.railPool.length] =rail;
+      this.railsGroup.add(rail);
+    }
+    if (counters.straightRails<=1){
+      let rail =  new Rail(this, 26, 8, 'railsprite', this.input.activePointer, 4, TILE_SIZE,this.inventory)
+      this.railPool[this.railPool.length] = rail;
+      this.railsGroup.add(rail);
+    }
+    
+    console.log(this.railPool.length);
+  }
+  CheckRails(){
+    let counters={curvedRails:0,straightRails:0};
+    for(let i = 0; i < this.railPool.length; i++)
+    {
+      let tile = this.railPool[i].ReturnTile();
+      if(this.railPool[i].ReturnRailType()===0 && tile.column === 24){counters.curvedRails++;}
+      else if(this.railPool[i].ReturnRailType()===4 && tile.column === 26){counters.straightRails++;}
+    }
+    console.log(counters.curvedRails);
+    console.log(counters.straightRails);
+    return counters;
+  }
   // changeState(state)
   // {
   //   this.state = state;

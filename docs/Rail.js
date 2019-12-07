@@ -1,27 +1,52 @@
 import {directionEnum, matrixEnum, stateEnum} from './Enums.js'
+import Inventory from './inventory.js';
 
 export default class Rail extends Phaser.GameObjects.Sprite
 {
-    constructor(scene, column, row, texture, pointer, railType, tileSize)
+    constructor(scene, column, row, texture, pointer, railType, tileSize,inventory)
     {
         super(scene, (column * tileSize) + tileSize / 2, (row * tileSize) + tileSize / 2, texture);
         scene.add.existing(this).setInteractive();
         scene.physics.add.existing(this);
         scene.input.setDraggable(this);
-
-        scene.input.on('dragstart', function (pointer, gameObject, dragX, dragY) {
-            gameObject.body.enable = false;
-            gameObject.rotatable = true;
+        this.on('dragstart', function (pointer, gameObject, dragX, dragY) {
+          if(inventory.GetRailCounter()>0 || (inventory.GetRailCounter()===0 && (gameObject.column!=24 && gameObject.column!=26 || gameObject.row!=8))){
+            this.body.enable = false;
+            this.rotatable = true;
+          }
         });
           scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
+
+            if(inventory.GetRailCounter()>0 || (inventory.GetRailCounter()===0 && (gameObject.column!=24 && gameObject.column!=26 || gameObject.row!=8))){
               gameObject.x = dragX;
               gameObject.y = dragY;
+              gameObject.column = Math.floor(gameObject.x / gameObject.tileSize);
+            }
           });
-          scene.input.on('dragend', function (pointer, gameObject, dragX, dragY) {
-            gameObject.body.enable = true;
-            gameObject.rotatable = false;
+          this.on('dragend', function (pointer, gameObject, dragX, dragY) {
+            this.body.enable = true;
+            this.rotatable = false;
+            console.log(this.column);
+            if(this.column>22){
+              inventory.ModifyRailCounter(1);
+              if(this.ReturnRailType()===4 || this.ReturnRailType()===5){
+                this.column = 26;
+                this.railType = 4;
+              }
+                else {
+                  this.column = 24;
+                  this.railType = 0;
+                }
+                this.row = 8;
+                this.x = (this.column * this.tileSize) + this.tileSize / 2;
+                this.y = (this.row * this.tileSize) + this.tileSize / 2;
+                this.angle = 0;
+            }
         });
-        
+        this.on('pointerdown', ()=>{
+          if(inventory.GetRailCounter()>0 && (this.column===24 || this.column===26 && this.row===8)) inventory.ModifyRailCounter(-1);
+          scene.CreateRail();
+        });
         this.tileSize = tileSize;
         this.column = column;
         this.row = row;
@@ -30,7 +55,6 @@ export default class Rail extends Phaser.GameObjects.Sprite
         this.pointer = pointer;
         this.state = stateEnum.ONTRACK;
         this.rotatable = false;
-
         switch (this.railType)
         {
           case 0:
@@ -65,7 +89,6 @@ export default class Rail extends Phaser.GameObjects.Sprite
                 this.x = (this.column * this.tileSize) + this.tileSize / 2;
                 this.y = (this.row * this.tileSize) + this.tileSize / 2;
             }
-
             
             else if (this.rotatable )
             {
@@ -83,7 +106,6 @@ export default class Rail extends Phaser.GameObjects.Sprite
     ReturnTile()
     {
         let tile = {column: this.column, row: this.row}
-
         return tile;
     }
 
