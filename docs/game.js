@@ -77,8 +77,7 @@ export default class Game extends Phaser.Scene {
     this.passengersGroup.add(this.passenger);
 
     this.trainsGroup.add(this.trainArray[0]);
-    this.trainArray[0].body.setCollideWorldBounds(true);
-    this.trainArray[0].body.onCollide = true;
+    // this.trainArray[0].body.setCollideWorldBounds(true);
     this.trainsGroup.add(this.trainArray[1]);
     // this.physics.add.overlap(this.trainArray[0],this.railsGroup);
     //creacion de colisiones entre entidades y callbacks
@@ -134,15 +133,14 @@ export default class Game extends Phaser.Scene {
     //Nota: como ya no se puede comprobar la posición exacta del tren con el rail para cambiar la direccion (porque con las fisicas se salta frames) hay que poner un pequeño offset en las comprobaciones
     //y abarcar todos los casos en Compatible();
     //si se superponen trenes y railes
+    if(this.Exit()){
+      this.scene.pause();
+    }
     this.physics.overlap(this.trainsGroup,this.railsGroup,(o1, o2) => {
       //comprueba si el rail es compatible con el tren, es decir, si puede entrar por ese lado del rail
       if(!o1.Compatible(o2)) this.scene.pause();
   });
 
-
-    if (this.state == stateEnum.ONTRACK)
-    {
-    }
   }
   createNewTrain()
   {
@@ -159,7 +157,7 @@ export default class Game extends Phaser.Scene {
 
   createPassenger()
   {
-    let tile = {column: Math.floor(Math.random() * COLUMNS), row: Math.floor(Math.random() * ROWS-5)};
+    let tile = {column: Math.floor(Math.random() * (COLUMNS-5)), row: Math.floor(Math.random() * ROWS)};
     this.passenger = new Passenger(this, tile.column, tile.row, 'passengersprite');
     this.passengersGroup.add(this.passenger);
   }
@@ -198,6 +196,13 @@ export default class Game extends Phaser.Scene {
     console.log(counters.curvedRails);
     console.log(counters.straightRails);
     return counters;
+  }
+  Exit(){
+    let pos;
+    pos = this.trainArray[0].ReturnPos();
+    console.log(pos.y);
+    if(pos.x < TILE_SIZE/2 || pos.y < TILE_SIZE/2 || pos.y > (TILE_SIZE * ROWS)-TILE_SIZE/2) return true;
+
   }
   // changeState(state)
   // {
