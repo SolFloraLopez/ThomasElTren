@@ -8,7 +8,7 @@ const TILE_SIZE = 50;
 const COLUMNS = 28;
 const ROWS = 16;
 const POOL_LENGTH = 12;
-const INITIAL_TRAIN_SPEED = 3;
+const INITIAL_TRAIN_SPEED = 5;
 const SPEED_INCREASE = 2;
 
 export default class Game extends Phaser.Scene {
@@ -58,12 +58,12 @@ export default class Game extends Phaser.Scene {
     this.scoreText = this.add.text(1155, 10, 'Puntos: 0', { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' ,fontSize: '35px'});
     
     //para ver la caja de colisiones del layer
-    // const debugGraphics = this.add.graphics().setAlpha(0.75);
-    // this.backgroundLayer.renderDebug(debugGraphics, {
-    // tileColor: null, // Color of non-colliding tiles
-    // collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
-    // faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
-    // });
+    const debugGraphics = this.add.graphics().setAlpha(0.75);
+    this.backgroundLayer.renderDebug(debugGraphics, {
+    tileColor: null, // Color of non-colliding tiles
+    collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
+    faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
+    });
    
     //grupos de colisiones
     this.railsGroup = this.physics.add.group();
@@ -75,9 +75,9 @@ export default class Game extends Phaser.Scene {
     this.trainArray[1] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 15 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
     //se añaden a los grupos de colisiones
     this.passengersGroup.add(this.passenger);
-
     this.trainsGroup.add(this.trainArray[0]);
     this.trainsGroup.add(this.trainArray[1]);
+
     //creacion de colisiones entre entidades y callbacks
     this.physics.add.collider(this.trainsGroup, this.passengersGroup, (o1, o2) => {
       o2.destroy();
