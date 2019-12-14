@@ -77,9 +77,7 @@ export default class Game extends Phaser.Scene {
     this.passengersGroup.add(this.passenger);
 
     this.trainsGroup.add(this.trainArray[0]);
-    // this.trainArray[0].body.setCollideWorldBounds(true);
     this.trainsGroup.add(this.trainArray[1]);
-    // this.physics.add.overlap(this.trainArray[0],this.railsGroup);
     //creacion de colisiones entre entidades y callbacks
     this.physics.add.collider(this.trainsGroup, this.passengersGroup, (o1, o2) => {
       o2.destroy();
@@ -183,7 +181,7 @@ export default class Game extends Phaser.Scene {
       this.railsGroup.add(rail);
     }
     
-    console.log(this.railPool.length);
+    console.log("lenght"+this.railPool.length);
   }
   CheckRails(){
     let counters={curvedRails:0,straightRails:0};
@@ -193,14 +191,13 @@ export default class Game extends Phaser.Scene {
       if(this.railPool[i].ReturnRailType()===0 && tile.column === 24){counters.curvedRails++;}
       else if(this.railPool[i].ReturnRailType()===4 && tile.column === 26){counters.straightRails++;}
     }
-    console.log(counters.curvedRails);
-    console.log(counters.straightRails);
+    console.log("C"+counters.curvedRails);
+    console.log("S"+counters.straightRails);
     return counters;
   }
   Exit(){
     let pos;
     pos = this.trainArray[0].ReturnPos();
-    console.log(pos.y);
     if(pos.x < TILE_SIZE/2 || pos.y < TILE_SIZE/2 || pos.y > (TILE_SIZE * ROWS)-TILE_SIZE/2) return true;
 
   }

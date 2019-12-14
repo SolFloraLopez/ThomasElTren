@@ -26,7 +26,6 @@ export default class Rail extends Phaser.GameObjects.Sprite
           this.on('dragend', function (pointer, gameObject, dragX, dragY) {
             this.body.enable = true;
             this.rotatable = false;
-            console.log(this.column);
             if(this.column>22){
               inventory.ModifyRailCounter(1);
               if(this.ReturnRailType()===4 || this.ReturnRailType()===5){
