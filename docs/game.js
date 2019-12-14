@@ -55,7 +55,7 @@ export default class Game extends Phaser.Scene {
     //se añade colision a las partes que tengan atributo collides == true
     this.backgroundLayer.setCollisionByProperty({collides: true});
     this.physics.world.setBounds(0, 0, 1400, 800);
-    this.scoreText = this.add.text(1155, 10, 'Puntos: 0', { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' ,fontSize: '35px'});
+    this.scoreText = this.add.text(1155, 15, 'Puntos: 0', { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' ,fontSize: '35px'});
     
     //para ver la caja de colisiones del layer
     const debugGraphics = this.add.graphics().setAlpha(0.75);
@@ -85,7 +85,7 @@ export default class Game extends Phaser.Scene {
       this.createPassenger();
       this.currentSpeed += SPEED_INCREASE;
       this.score+=10;
-      this.scoreText.setText('Score: '+ this.score);
+      this.scoreText.setText('Puntos: '+ this.score);
       this.changeTrainSpeed();
     });
     this.physics.add.collider(this.passengersGroup, this.backgroundLayer, () => {

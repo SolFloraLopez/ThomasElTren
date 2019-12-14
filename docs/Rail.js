@@ -20,7 +20,7 @@ export default class Rail extends Phaser.GameObjects.Sprite
               this.rotatable = true;
             }
           }
-          else{
+          else if (this.railType>=4){
             if(inventory.GetRailCounter('B')>0 || (inventory.GetRailCounter('B')===0 && (this.column!=26 || this.row!=8))){
               this.body.enable = false;
               this.rotatable = true;
@@ -37,7 +37,7 @@ export default class Rail extends Phaser.GameObjects.Sprite
                 gameObject.column = Math.floor(gameObject.x / gameObject.tileSize);
               }
             }
-            else{
+            else if (gameObject.railType>=4){
               if(inventory.GetRailCounter('B')>0 || (inventory.GetRailCounter('B')===0 && (gameObject.column!=26 || gameObject.row!=8))){
                 gameObject.x = dragX;
                 gameObject.y = dragY;
@@ -56,7 +56,7 @@ export default class Rail extends Phaser.GameObjects.Sprite
                 this.column = 24;
                 this.railType = 0;
               }
-              else{
+              else if (this.railType>=4){
                 inventory.ModifyRailCounter(1,'B');
                 this.column = 26;
                 this.railType = 4;
@@ -72,7 +72,7 @@ export default class Rail extends Phaser.GameObjects.Sprite
           if(this.railType<4){
             if(inventory.GetRailCounter('A')>0 && (this.column===24 && this.row===8)) inventory.ModifyRailCounter(-1,'A');
           }
-          else{
+          else if (this.railType>=4){
             if(inventory.GetRailCounter('B')>0 && (this.column===26 && this.row===8)) inventory.ModifyRailCounter(-1,'B');
           }
           scene.CreateRail();
@@ -119,8 +119,7 @@ export default class Rail extends Phaser.GameObjects.Sprite
                 this.x = (this.column * this.tileSize) + this.tileSize / 2;
                 this.y = (this.row * this.tileSize) + this.tileSize / 2;
             }
-            
-            else if (this.rotatable )
+            else if (this.rotatable)
             {
                 if(Phaser.Input.Keyboard.JustDown(this.scene.r))
                 {

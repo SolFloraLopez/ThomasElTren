@@ -5,8 +5,8 @@ export default class Inventory extends Phaser.GameObjects.GameObject {
     {
         super(scene);
         scene.add.existing(this);
-        this.railCounter = 10;
-        this.railBCounter = 10;
+        this.railCounter = railCounter;
+        this.railBCounter = railCounter;
         let num = this.railCounter-1;
         let numB = this.railBCounter-1;
         this.railCounterText = this.scene.add.text(1155, 90, 'Raíles: '+ num, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' ,fontSize: '28px'});
