@@ -7,7 +7,7 @@ import {directionEnum, matrixEnum, stateEnum} from './Enums.js'
 const TILE_SIZE = 50;
 const COLUMNS = 28;
 const ROWS = 16;
-const POOL_LENGTH = 12;
+const POOL_LENGTH = 12; //Siempre par
 const INITIAL_TRAIN_SPEED = 5;
 const SPEED_INCREASE = 2;
 
@@ -101,9 +101,8 @@ export default class Game extends Phaser.Scene {
   //     console.log("222");
   // });
     // new Rail(this, 10, 10, 'Railsprite', this.input.activePointer, 0);
-    let curvedRailCount=0;
-    let straightRailCount=0;
-    this.inventory = new Inventory(this,POOL_LENGTH-1,curvedRailCount);
+
+    this.inventory = new Inventory(this,(POOL_LENGTH/2)-1);
     for(let i = 0; i < POOL_LENGTH; i++)
     {
       //el tipo de rail definira su angulo
@@ -111,11 +110,11 @@ export default class Game extends Phaser.Scene {
       
       if (railType == 0) {
         this.railPool[i] = new Rail(this, 24, 8, 'curvedrailsprite', this.input.activePointer, railType, TILE_SIZE,this.inventory);
-        curvedRailCount++;
+
       }
       else {
         this.railPool[i] = new Rail(this, 26, 8, 'railsprite', this.input.activePointer, railType, TILE_SIZE,this.inventory);
-        straightRailCount++;
+
       }
       
       //ademas de crearlos se añaden al grupo de colisiones

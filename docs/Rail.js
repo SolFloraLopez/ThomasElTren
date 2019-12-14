@@ -10,40 +10,71 @@ export default class Rail extends Phaser.GameObjects.Sprite
         scene.physics.add.existing(this);
         scene.input.setDraggable(this);
         this.on('dragstart', function (pointer, gameObject, dragX, dragY) {
-          if(inventory.GetRailCounter()>0 || (inventory.GetRailCounter()===0 && (gameObject.column!=24 && gameObject.column!=26 || gameObject.row!=8))){
-            this.body.enable = false;
-            this.rotatable = true;
+          if(this.railType<4){
+            console.log("sdadas"+inventory.GetRailCounter('A'));
+            console.log(this.column);
+            console.log(this.row);
+            if(inventory.GetRailCounter('A')>0 || (inventory.GetRailCounter('A')===0 && (this.column!=24 || this.row!=8))){
+
+              this.body.enable = false;
+              this.rotatable = true;
+            }
           }
+          else{
+            if(inventory.GetRailCounter('B')>0 || (inventory.GetRailCounter('B')===0 && (this.column!=26 || this.row!=8))){
+              this.body.enable = false;
+              this.rotatable = true;
+            }
+          }
+          
+
         });
           scene.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-
-            if(inventory.GetRailCounter()>0 || (inventory.GetRailCounter()===0 && (gameObject.column!=24 && gameObject.column!=26 || gameObject.row!=8))){
-              gameObject.x = dragX;
-              gameObject.y = dragY;
-              gameObject.column = Math.floor(gameObject.x / gameObject.tileSize);
+            if(gameObject.railType<4){
+              if(inventory.GetRailCounter('A')>0 || (inventory.GetRailCounter('A')===0 && (gameObject.column!=24 || gameObject.row!=8))){
+                gameObject.x = dragX;
+                gameObject.y = dragY;
+                gameObject.column = Math.floor(gameObject.x / gameObject.tileSize);
+              }
             }
+            else{
+              if(inventory.GetRailCounter('B')>0 || (inventory.GetRailCounter('B')===0 && (gameObject.column!=26 || gameObject.row!=8))){
+                gameObject.x = dragX;
+                gameObject.y = dragY;
+                gameObject.column = Math.floor(gameObject.x / gameObject.tileSize);
+              }
+            }
+
           });
           this.on('dragend', function (pointer, gameObject, dragX, dragY) {
             this.body.enable = true;
             this.rotatable = false;
             if(this.column>22){
-              inventory.ModifyRailCounter(1);
-              if(this.ReturnRailType()===4 || this.ReturnRailType()===5){
+
+              if(this.railType<4){
+                inventory.ModifyRailCounter(1,'A');
+                this.column = 24;
+                this.railType = 0;
+              }
+              else{
+                inventory.ModifyRailCounter(1,'B');
                 this.column = 26;
                 this.railType = 4;
               }
-                else {
-                  this.column = 24;
-                  this.railType = 0;
-                }
-                this.row = 8;
-                this.x = (this.column * this.tileSize) + this.tileSize / 2;
-                this.y = (this.row * this.tileSize) + this.tileSize / 2;
-                this.angle = 0;
+              this.row = 8;
+              this.x = (this.column * this.tileSize) + this.tileSize / 2;
+              this.y = (this.row * this.tileSize) + this.tileSize / 2;
+              this.angle = 0;
             }
+            
         });
         this.on('pointerdown', ()=>{
-          if(inventory.GetRailCounter()>0 && (this.column===24 || this.column===26 && this.row===8)) inventory.ModifyRailCounter(-1);
+          if(this.railType<4){
+            if(inventory.GetRailCounter('A')>0 && (this.column===24 && this.row===8)) inventory.ModifyRailCounter(-1,'A');
+          }
+          else{
+            if(inventory.GetRailCounter('B')>0 && (this.column===26 && this.row===8)) inventory.ModifyRailCounter(-1,'B');
+          }
           scene.CreateRail();
         });
         this.tileSize = tileSize;

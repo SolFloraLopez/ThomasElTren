@@ -5,9 +5,12 @@ export default class Inventory extends Phaser.GameObjects.GameObject {
     {
         super(scene);
         scene.add.existing(this);
-        this.railCounter = railCounter;
+        this.railCounter = 10;
+        this.railBCounter = 10;
         let num = this.railCounter-1;
-        this.railCounterText = this.scene.add.text(1155, 90, 'Raíles: '+ num, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' ,fontSize: '35px'});
+        let numB = this.railBCounter-1;
+        this.railCounterText = this.scene.add.text(1155, 90, 'Raíles: '+ num, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' ,fontSize: '28px'});
+        this.railBCounterText = this.scene.add.text(1155, 150, 'Raíles puente: '+ numB, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' ,fontSize: '27px'});
     }
     
     UpdateRailCounterText(){
@@ -15,12 +18,24 @@ export default class Inventory extends Phaser.GameObjects.GameObject {
         if(num<0) num =0;
     this.railCounterText.setText('Raíles: '+ num);
     }
-    ModifyRailCounter(num)
-    {
-        this.railCounter+=num;
-        this.UpdateRailCounterText();
+    UpdateRailBCounterText(){
+        let numB = this.railBCounter-1;
+        if(numB<0) numB =0;
+    this.railBCounterText.setText('Raíles puente: '+ numB);
     }
-    GetRailCounter(){
-        return this.railCounter;
+    ModifyRailCounter(num,counter)
+    {
+        if(counter==='A'){
+            this.railCounter+=num;
+            this.UpdateRailCounterText();
+        } 
+        else if (counter === 'B'){
+            this.railBCounter+=num;
+            this.UpdateRailBCounterText();
+        } 
+    }
+    GetRailCounter(counter){
+        if(counter==='A') return this.railCounter;
+        else if (counter === 'B') return this.railBCounter;
     }
 }
