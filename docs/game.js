@@ -21,7 +21,7 @@ export default class Game extends Phaser.Scene {
     this.currentSpeed = INITIAL_TRAIN_SPEED;
     this.railPool = [];
     this.trainArray = [];
-    this.gameMatrix = [];
+    this.aestheticRails = [];
   }
 
   preload()
@@ -136,8 +136,9 @@ export default class Game extends Phaser.Scene {
     this.physics.overlap(this.trainsGroup,this.railsGroup,(o1, o2) => {
       //comprueba si el rail es compatible con el tren, es decir, si puede entrar por ese lado del rail
       if(!o1.Compatible(o2)) this.scene.pause();
-  });
+    });
 
+    this.CheckAestheticRails();
   }
   createNewTrain()
   {
@@ -182,6 +183,7 @@ export default class Game extends Phaser.Scene {
     
     console.log("lenght"+this.railPool.length);
   }
+
   CheckRails(){
     let counters={curvedRails:0,straightRails:0};
     for(let i = 0; i < this.railPool.length; i++)
@@ -194,6 +196,46 @@ export default class Game extends Phaser.Scene {
     console.log("S"+counters.straightRails);
     return counters;
   }
+
+  CheckAestheticRails()
+  {
+    let i = 0;
+    let flag = false;
+    let aestheticRailTile;
+    let trainHeadTile = this.trainArray[0].ReturnTile();
+    let trainHeadDir = this.trainArray[0].ReturnDirection();
+
+    if(this.aestheticRails.length > 0) 
+    {   
+      aestheticRailTile = {column: Math.floor(this.aestheticRails[this.aestheticRails.length - 1].getCenter().x / TILE_SIZE), 
+      row: Math.floor(this.aestheticRails[this.aestheticRails.length - 1].getCenter().y / TILE_SIZE) }
+      if (aestheticRailTile.column === trainHeadTile.column && aestheticRailTile.row === trainHeadTile.row) flag = true;
+    }
+
+    if(!flag)
+    {
+      this.aestheticRails[this.aestheticRails.length] = this.add.sprite(trainHeadTile.column * TILE_SIZE + TILE_SIZE / 2, trainHeadTile.row * TILE_SIZE + TILE_SIZE / 2, 'railsprite');
+      if(trainHeadDir === directionEnum.LEFT || trainHeadDir === directionEnum.RIGHT) this.aestheticRails[this.aestheticRails.length - 1].setAngle(90);
+    } 
+
+    flag = false;
+    i = 0;
+    aestheticRailTile = {column: Math.floor(this.aestheticRails[0].getCenter().x / TILE_SIZE), row: Math.floor(this.aestheticRails[0].getCenter().y / TILE_SIZE) }
+
+    while(!flag && i < this.trainArray.length) 
+    {
+      trainHeadTile = this.trainArray[i].ReturnTile();
+      if (aestheticRailTile.column === trainHeadTile.column && aestheticRailTile.row === trainHeadTile.row) flag = true;
+      i++;
+    }
+
+    if(!flag)
+    {
+      this.aestheticRails[0].destroy();
+      this.aestheticRails.shift();
+    }
+  }
+
   Exit(){
     let pos;
     pos = this.trainArray[0].ReturnPos();
