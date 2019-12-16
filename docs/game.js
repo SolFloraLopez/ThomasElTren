@@ -1,6 +1,6 @@
 import Train, * as train from './train.js'
 import Rail, * as rail from './Rail.js'
-import Passenger, * as passenger from './passenger.js'
+import Collectible, * as collectible from './collectible.js'
 import Inventory, * as inventory from './inventory.js'
 import {directionEnum, matrixEnum, stateEnum} from './Enums.js'
 
@@ -65,13 +65,14 @@ export default class Game extends Phaser.Scene {
     collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
     faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
     });
+
     //grupos de colisiones
     this.railsGroup = this.physics.add.group();
     this.trainsGroup = this.physics.add.group();
     this.passengersGroup = this.physics.add.group();
     this.boxsGroup = this.physics.add.group();
     //crea las entidades (los pasajeros seran un array tambien)
-    this.passenger = new Passenger(this, 14, 9, 'passengersprite');
+    this.passenger = new Collectible(this, 14, 9, 'passengersprite');
     this.trainArray[0] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 14 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
     this.trainArray[1] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 15 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
     //se añaden a los grupos de colisiones
@@ -115,6 +116,17 @@ export default class Game extends Phaser.Scene {
     this.physics.add.collider(this.trainsGroup, this.backgroundLayer, () => {
       this.scene.pause();
     });
+
+    // this.physics.add.overlap(this.railsGroup, this.backgroundLayer, (o1,o2) => {
+    //   console.log(o2.properties.collides);
+    //   o2.setCollision(false);
+    // });
+    // this.input.on('pointerdown', (pointer,gameObject)=>{
+    //   let column = Math.floor(pointer.worldX / 50)
+    //   console.log(column);
+    //   console.log(gameObject);
+    // });
+
   //   this.input.on('pointerdown', function (pointer) {
   //     console.log(pointer.x);
   //     this.scene.inventory.ModifyRailCounter(-1);
@@ -157,6 +169,7 @@ export default class Game extends Phaser.Scene {
       //comprueba si el rail es compatible con el tren, es decir, si puede entrar por ese lado del rail
       if(!o1.Compatible(o2)) this.scene.pause();
     });
+    
 
     this.CheckAestheticRails();
   }
@@ -176,13 +189,13 @@ export default class Game extends Phaser.Scene {
   createPassenger()
   {
     let tile = {column: Math.floor(Math.random() * (COLUMNS-5)), row: Math.floor(Math.random() * ROWS)};
-    this.passenger = new Passenger(this, tile.column, tile.row, 'passengersprite');
+    this.passenger = new Collectible(this, tile.column, tile.row, 'passengersprite');
     this.passengersGroup.add(this.passenger);
   }
   createBox()
   {
     let tile = {column: Math.floor(Math.random() * (COLUMNS-5)), row: Math.floor(Math.random() * ROWS)};
-    this.box = new Passenger(this, tile.column, tile.row, 'boxsprite');
+    this.box = new Collectible(this, tile.column, tile.row, 'boxsprite');
     this.boxsGroup.add(this.box);
   }
 

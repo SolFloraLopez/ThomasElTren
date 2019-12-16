@@ -66,6 +66,13 @@ export default class Rail extends Phaser.GameObjects.Sprite
               this.y = (this.row * this.tileSize) + this.tileSize / 2;
               this.angle = 0;
             }
+            this.scene.physics.overlap(this,this.scene.backgroundLayer,(o1, o2) => {
+              console.log(o1.column);
+              //buscar el tile de background layer que coincida con la posicion de o1, y desactivar su colision
+              console.log("s");
+              console.log(this.scene.backgroundLayer);
+              o2.setCollision(false);
+            });
             
         });
         this.on('pointerdown', ()=>{
@@ -77,6 +84,8 @@ export default class Rail extends Phaser.GameObjects.Sprite
           }
           scene.CreateRail();
         });
+
+
         this.tileSize = tileSize;
         this.column = column;
         this.row = row;
