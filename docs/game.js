@@ -133,6 +133,7 @@ export default class Game extends Phaser.Scene {
     this.physics.add.collider(this.trainsGroup, this.backgroundLayer, () => {
       this.scene.pause();
     });
+    
 
     this.input.on('pointerdown', (pointer)=>{
       let pointerC = Math.floor((pointer.x/TILE_SIZE));
