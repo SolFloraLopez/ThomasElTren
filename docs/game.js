@@ -1,6 +1,7 @@
 import Train, * as train from './train.js'
 import Rail, * as rail from './Rail.js'
 import Collectible, * as collectible from './collectible.js'
+import Water, * as water from './water.js'
 import Inventory, * as inventory from './inventory.js'
 import {directionEnum, matrixEnum, stateEnum} from './Enums.js'
 
@@ -10,6 +11,7 @@ const ROWS = 16;
 const POOL_LENGTH = 12; //Siempre par
 const INITIAL_TRAIN_SPEED = 5;
 const SPEED_INCREASE = 2;
+const WATER_SLOTS = 4;
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -33,6 +35,7 @@ export default class Game extends Phaser.Scene {
 
     this.load.image('passengersprite', 'img/passenger.png', { frameWidth: 50, frameHeight: 50 })
     this.load.image('boxsprite', 'img/box.png', { frameWidth: 50, frameHeight: 50 })
+    this.load.image('watersprite', 'img/water.png', { frameWidth: 50, frameHeight: 50 })
 
     this.load.image('curvedrailsprite', 'img/curvedrail.png', {frameWidth: 32, frameHeight: 32})
 
@@ -71,8 +74,13 @@ export default class Game extends Phaser.Scene {
     this.trainsGroup = this.physics.add.group();
     this.passengersGroup = this.physics.add.group();
     this.boxsGroup = this.physics.add.group();
+    this.waterGroup = this.physics.add.group();
     //crea las entidades (los pasajeros seran un array tambien)
     this.passenger = new Collectible(this, 14, 9, 'passengersprite');
+
+    //Crea agua en el mapa
+    for(let i=0;i<WATER_SLOTS;i++) this.createWater();
+
     this.trainArray[0] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 14 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
     this.trainArray[1] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 15 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
     //se añaden a los grupos de colisiones
@@ -113,10 +121,28 @@ export default class Game extends Phaser.Scene {
       o2.destroy();
       this.createBox();
     });
+    this.physics.add.collider(this.waterGroup, this.backgroundLayer, () => {
+      o2.destroy();
+      this.createWater();
+    });
     this.physics.add.collider(this.trainsGroup, this.backgroundLayer, () => {
       this.scene.pause();
     });
 
+    this.physics.add.overlap(this.trainsGroup, this.waterGroup, (o1,o2) => {
+      console.log(o2.avoidable);
+      if(!o2.avoidable) this.scene.pause();
+    });
+
+    this.input.on('pointerdown', (pointer)=>{
+      let pointerC = Math.floor((pointer.x/TILE_SIZE));
+      let pointerR = Math.floor((pointer.y/TILE_SIZE))
+      let pointerPos = {column: pointerC,row: pointerR};
+      let objectReturned = this.SearchWater(pointerPos);
+      if(objectReturned.found && objectReturned.water.avoidable){
+        objectReturned.water.SetAvoidable(false);
+      }
+    });
     // this.physics.add.overlap(this.railsGroup, this.backgroundLayer, (o1,o2) => {
     //   console.log(o2.properties.collides);
     //   o2.setCollision(false);
@@ -198,6 +224,11 @@ export default class Game extends Phaser.Scene {
     this.box = new Collectible(this, tile.column, tile.row, 'boxsprite');
     this.boxsGroup.add(this.box);
   }
+  createWater(){
+    let tile = {column: Math.floor(Math.random() * (COLUMNS-5)), row: Math.floor(Math.random() * ROWS)};
+    this.water = new Water(this, tile.column, tile.row, 'watersprite');
+    this.waterGroup.add(this.water);
+  }
 
   changeTrainSpeed()
   {
@@ -220,7 +251,7 @@ export default class Game extends Phaser.Scene {
       this.railsGroup.add(rail);
     }
     
-    console.log("lenght"+this.railPool.length);
+    // console.log("lenght"+this.railPool.length);
   }
 
   CheckRails(){
@@ -231,8 +262,8 @@ export default class Game extends Phaser.Scene {
       if(this.railPool[i].ReturnRailType()===0 && tile.column === 24){counters.curvedRails++;}
       else if(this.railPool[i].ReturnRailType()===4 && tile.column === 26){counters.straightRails++;}
     }
-    console.log("C"+counters.curvedRails);
-    console.log("S"+counters.straightRails);
+    // console.log("C"+counters.curvedRails);
+    // console.log("S"+counters.straightRails);
     return counters;
   }
 
@@ -312,6 +343,20 @@ export default class Game extends Phaser.Scene {
     let pos;
     pos = this.trainArray[0].ReturnPos();
     if(pos.x < TILE_SIZE/3 || pos.y < TILE_SIZE/3 || pos.y > (TILE_SIZE * ROWS)-TILE_SIZE/3) return true;
+  }
+  SearchWater(pointerPos){
+    let waterArray = this.waterGroup.getChildren();
+    let found = false;
+    let waterFound;
+    for (let i = 0;i<waterArray.length && !found;i++){
+      if(waterArray[i].column === pointerPos.column && waterArray[i].row === pointerPos.row) {
+        found = true;
+        waterFound = waterArray[i];
+      }
+    }
+    let returnObject = {found: found,water: waterFound};
+    return returnObject;
+
   }
   // changeState(state)
   // {
