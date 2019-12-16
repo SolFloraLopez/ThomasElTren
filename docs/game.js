@@ -88,7 +88,7 @@ export default class Game extends Phaser.Scene {
     this.trainsGroup.add(this.trainArray[0]);
     this.trainsGroup.add(this.trainArray[1]);
 
-    //creacion de colisiones entre entidades y callbacks
+    //creacion de colisiones entre entidades, y callbacks
     this.physics.add.collider(this.trainsGroup, this.passengersGroup, (o1, o2) => {
       o2.destroy();
       this.createNewTrain();
@@ -113,6 +113,11 @@ export default class Game extends Phaser.Scene {
       }
 
     });
+    this.physics.add.overlap(this.trainsGroup, this.waterGroup, (o1,o2) => {
+      console.log(o2.avoidable);
+      if(!o2.avoidable) this.scene.pause();
+    });
+
     this.physics.add.collider(this.passengersGroup, this.backgroundLayer, () => {
       o2.destroy();
       this.createPassenger();
@@ -127,11 +132,6 @@ export default class Game extends Phaser.Scene {
     });
     this.physics.add.collider(this.trainsGroup, this.backgroundLayer, () => {
       this.scene.pause();
-    });
-
-    this.physics.add.overlap(this.trainsGroup, this.waterGroup, (o1,o2) => {
-      console.log(o2.avoidable);
-      if(!o2.avoidable) this.scene.pause();
     });
 
     this.input.on('pointerdown', (pointer)=>{
