@@ -32,6 +32,7 @@ export default class Game extends Phaser.Scene {
     this.load.image('trainsprite', 'img/trainwagon.png', { frameWidth: 50, frameHeight: 50 })
 
     this.load.image('passengersprite', 'img/passenger.png', { frameWidth: 50, frameHeight: 50 })
+    this.load.image('boxsprite', 'img/box.png', { frameWidth: 50, frameHeight: 50 })
 
     this.load.image('curvedrailsprite', 'img/curvedrail.png', {frameWidth: 32, frameHeight: 32})
 
@@ -64,11 +65,11 @@ export default class Game extends Phaser.Scene {
     collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
     faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
     });
-   
     //grupos de colisiones
     this.railsGroup = this.physics.add.group();
     this.trainsGroup = this.physics.add.group();
     this.passengersGroup = this.physics.add.group();
+    this.boxsGroup = this.physics.add.group();
     //crea las entidades (los pasajeros seran un array tambien)
     this.passenger = new Passenger(this, 14, 9, 'passengersprite');
     this.trainArray[0] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 14 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
@@ -83,14 +84,32 @@ export default class Game extends Phaser.Scene {
       o2.destroy();
       this.createNewTrain();
       this.createPassenger();
+      let rnd = Math.round(Math.random() * 10);
+      if(rnd>=8) this.createBox();
       this.currentSpeed += SPEED_INCREASE;
       this.score+=10;
       this.scoreText.setText('Puntos: '+ this.score);
       this.changeTrainSpeed();
     });
+    this.physics.add.collider(this.trainsGroup, this.boxsGroup, (o1, o2) => {
+      o2.destroy();
+      let rnd = Math.round(Math.random() * 10);
+      if(rnd>=5){
+        this.inventory.ModifyRailCounter(1,'B');
+      }
+      else {
+        this.score+=10;
+        this.scoreText.setText('Puntos: '+ this.score);
+      }
+
+    });
     this.physics.add.collider(this.passengersGroup, this.backgroundLayer, () => {
       o2.destroy();
       this.createPassenger();
+    });
+    this.physics.add.collider(this.boxsGroup, this.backgroundLayer, () => {
+      o2.destroy();
+      this.createBox();
     });
     this.physics.add.collider(this.trainsGroup, this.backgroundLayer, () => {
       this.scene.pause();
@@ -158,6 +177,12 @@ export default class Game extends Phaser.Scene {
     let tile = {column: Math.floor(Math.random() * (COLUMNS-5)), row: Math.floor(Math.random() * ROWS)};
     this.passenger = new Passenger(this, tile.column, tile.row, 'passengersprite');
     this.passengersGroup.add(this.passenger);
+  }
+  createBox()
+  {
+    let tile = {column: Math.floor(Math.random() * (COLUMNS-5)), row: Math.floor(Math.random() * ROWS)};
+    this.box = new Passenger(this, tile.column, tile.row, 'boxsprite');
+    this.boxsGroup.add(this.box);
   }
 
   changeTrainSpeed()
@@ -239,7 +264,7 @@ export default class Game extends Phaser.Scene {
   Exit(){
     let pos;
     pos = this.trainArray[0].ReturnPos();
-    if(pos.x < TILE_SIZE/2 || pos.y < TILE_SIZE/2 || pos.y > (TILE_SIZE * ROWS)-TILE_SIZE/2) return true;
+    if(pos.x < TILE_SIZE/3 || pos.y < TILE_SIZE/3 || pos.y > (TILE_SIZE * ROWS)-TILE_SIZE/3) return true;
 
   }
   // changeState(state)
