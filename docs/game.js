@@ -87,6 +87,7 @@ export default class Game extends Phaser.Scene {
       let rnd = Math.round(Math.random() * 10);
       if(rnd>=8) this.createBox();
       this.currentSpeed += SPEED_INCREASE;
+      this.inventory.ModifyRailCounter(1, 'A')
       this.score+=10;
       this.scoreText.setText('Puntos: '+ this.score);
       this.changeTrainSpeed();
@@ -224,28 +225,47 @@ export default class Game extends Phaser.Scene {
 
   CheckAestheticRails()
   {
-    let i = 0;
     let flag = false;
     let aestheticRailTile;
     let trainHeadTile = this.trainArray[0].ReturnTile();
+
+    this.AestheticRailsCreation(flag, aestheticRailTile, trainHeadTile);
+
+    flag = false;
+    aestheticRailTile = {column: Math.floor(this.aestheticRails[0].getCenter().x / TILE_SIZE), row: Math.floor(this.aestheticRails[0].getCenter().y / TILE_SIZE) }
+    this.AestheticRailsDestruction(flag, aestheticRailTile, trainHeadTile);
+  }
+
+  AestheticRailsCreation(flag, aestheticRailTile, trainHeadTile)
+  {
+    let i = 0;
     let trainHeadDir = this.trainArray[0].ReturnDirection();
 
     if(this.aestheticRails.length > 0) 
     {   
       aestheticRailTile = {column: Math.floor(this.aestheticRails[this.aestheticRails.length - 1].getCenter().x / TILE_SIZE), 
       row: Math.floor(this.aestheticRails[this.aestheticRails.length - 1].getCenter().y / TILE_SIZE) }
+
       if (aestheticRailTile.column === trainHeadTile.column && aestheticRailTile.row === trainHeadTile.row) flag = true;
+
+      while(!flag && i < this.railPool.length) 
+      {
+        let curvedRailTile = this.railPool[i].ReturnTile();
+        if (aestheticRailTile.column === curvedRailTile.column && aestheticRailTile.row === curvedRailTile.row) flag = true;
+        i++;
+      }
     }
 
     if(!flag)
     {
       this.aestheticRails[this.aestheticRails.length] = this.add.sprite(trainHeadTile.column * TILE_SIZE + TILE_SIZE / 2, trainHeadTile.row * TILE_SIZE + TILE_SIZE / 2, 'railsprite');
-      if(trainHeadDir === directionEnum.LEFT || trainHeadDir === directionEnum.RIGHT) this.aestheticRails[this.aestheticRails.length - 1].setAngle(90);
+      if(trainHeadDir % 2 !== 0) this.aestheticRails[this.aestheticRails.length - 1].setAngle(90);
     } 
+  }
 
-    flag = false;
-    i = 0;
-    aestheticRailTile = {column: Math.floor(this.aestheticRails[0].getCenter().x / TILE_SIZE), row: Math.floor(this.aestheticRails[0].getCenter().y / TILE_SIZE) }
+  AestheticRailsDestruction(flag, aestheticRailTile, trainHeadTile)
+  {
+    let i = 0;
 
     while(!flag && i < this.trainArray.length) 
     {
@@ -259,13 +279,26 @@ export default class Game extends Phaser.Scene {
       this.aestheticRails[0].destroy();
       this.aestheticRails.shift();
     }
+
+    i = 0;
+    
+    while(flag && i < this.railPool.length) 
+    {
+      let curvedRailTile = this.railPool[i].ReturnTile();
+      if (aestheticRailTile.column === curvedRailTile.column && aestheticRailTile.row === curvedRailTile.row)
+      {
+        this.aestheticRails[0].destroy();
+        this.aestheticRails.shift();
+        flag = false;
+      }
+      i++;
+    }
   }
 
   Exit(){
     let pos;
     pos = this.trainArray[0].ReturnPos();
     if(pos.x < TILE_SIZE/3 || pos.y < TILE_SIZE/3 || pos.y > (TILE_SIZE * ROWS)-TILE_SIZE/3) return true;
-
   }
   // changeState(state)
   // {
