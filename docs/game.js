@@ -81,8 +81,8 @@ export default class Game extends Phaser.Scene {
     //Crea agua en el mapa
     for(let i=0;i<WATER_SLOTS;i++) this.createWater();
 
-    this.trainArray[0] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 14 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
-    this.trainArray[1] = new Train(this, 14 * TILE_SIZE + TILE_SIZE / 2, 15 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
+    this.trainArray[0] = new Train(this, 11 * TILE_SIZE + TILE_SIZE / 2, 15 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
+    this.trainArray[1] = new Train(this, 11 * TILE_SIZE + TILE_SIZE / 2, 16 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
     //se añaden a los grupos de colisiones
     this.passengersGroup.add(this.passenger);
     this.trainsGroup.add(this.trainArray[0]);
@@ -225,7 +225,11 @@ export default class Game extends Phaser.Scene {
     this.boxsGroup.add(this.box);
   }
   createWater(){
-    let tile = {column: Math.floor(Math.random() * (COLUMNS-5)), row: Math.floor(Math.random() * ROWS)};
+    let tile;
+    //con este do, se evita que se cree agua debajo del tren y deja margen para que avance
+    do{
+       tile = {column: Math.floor(Math.random() * (COLUMNS-5)), row: Math.floor(Math.random() * ROWS)};
+    }while(tile.column==11 && tile.row>=12);
     this.water = new Water(this, tile.column, tile.row, 'watersprite');
     this.waterGroup.add(this.water);
   }
