@@ -14,8 +14,9 @@ const SPEED_INCREASE = 2;
 const WATER_SLOTS = 4;
 
 export default class Game extends Phaser.Scene {
-  constructor() {
+  constructor(level) {
     super({ key: 'main' });
+    this.level = level;
     this.inventory;
     this.score = 0;
     this.scoreText;
@@ -28,8 +29,8 @@ export default class Game extends Phaser.Scene {
 
   preload()
   {
-    this.load.tilemapTiledJSON('tilemap','./tilemap.json')
-    this.load.image('patronesTilemap','img/terrain.png')
+    this.load.tilemapTiledJSON('tilemap'+this.level,'./tilemap'+this.level+'.json')
+    this.load.image('patronesTilemap'+this.level,'img/terrain'+this.level+'.png')
     this.load.image('railsprite', 'img/rail.png', {frameWidth: 32, frameHeight: 48})
     this.load.image('trainsprite', 'img/trainwagon.png', { frameWidth: 50, frameHeight: 50 })
 
@@ -45,15 +46,16 @@ export default class Game extends Phaser.Scene {
   {
 
     this.map = this.make.tilemap({
-      key: 'tilemap',
+      key: 'tilemap'+this.level,
       tileWidth: 64,
       tileHeight: 64
     });
 
 
     this.r = this.input.keyboard.addKey('R');
+    this.esc = this.input.keyboard.addKey('ESC');
 
-    this.map.addTilesetImage('terrain','patronesTilemap');
+    this.map.addTilesetImage('terrain','patronesTilemap'+this.level);
     //crea capa con tileset "terrain"
     this.backgroundLayer = this.map.createStaticLayer('Background','terrain');
     //se añade colision a las partes que tengan atributo collides == true
@@ -133,7 +135,6 @@ export default class Game extends Phaser.Scene {
     this.physics.add.collider(this.trainsGroup, this.backgroundLayer, () => {
       this.scene.pause();
     });
-    
 
     this.input.on('pointerdown', (pointer)=>{
       let pointerC = Math.floor((pointer.x/TILE_SIZE));
@@ -144,10 +145,12 @@ export default class Game extends Phaser.Scene {
         objectReturned.water.SetAvoidable(false);
       }
     });
-    // this.physics.add.overlap(this.railsGroup, this.backgroundLayer, (o1,o2) => {
-    //   console.log(o2.properties.collides);
-    //   o2.setCollision(false);
-    // });
+
+    this.esc.on('up',()=>{
+      this.scene.launch('pause');
+      this.scene.pause(this);
+    });
+
     // this.input.on('pointerdown', (pointer,gameObject)=>{
     //   let column = Math.floor(pointer.worldX / 50)
     //   console.log(column);
