@@ -1,3 +1,4 @@
+import EndMenu from './endMenu.js'
 import Train, * as train from './train.js'
 import Rail, * as rail from './Rail.js'
 import Collectible, * as collectible from './collectible.js'
@@ -117,7 +118,7 @@ export default class Game extends Phaser.Scene {
     });
     this.physics.add.overlap(this.trainsGroup, this.waterGroup, (o1,o2) => {
       console.log(o2.avoidable);
-      if(!o2.avoidable) this.scene.pause();
+      if(!o2.avoidable) this.EndGame();
     });
 
     this.physics.add.collider(this.passengersGroup, this.backgroundLayer, () => {
@@ -133,7 +134,7 @@ export default class Game extends Phaser.Scene {
       this.createWater();
     });
     this.physics.add.collider(this.trainsGroup, this.backgroundLayer, () => {
-      this.scene.pause();
+      this.EndGame();
     });
 
     this.input.on('pointerdown', (pointer)=>{
@@ -150,7 +151,6 @@ export default class Game extends Phaser.Scene {
       this.scene.launch('pause');
       this.scene.pause(this);
     });
-
     // this.input.on('pointerdown', (pointer,gameObject)=>{
     //   let column = Math.floor(pointer.worldX / 50)
     //   console.log(column);
@@ -193,11 +193,11 @@ export default class Game extends Phaser.Scene {
     //y abarcar todos los casos en Compatible();
     //si se superponen trenes y railes
     if(this.Exit()){
-      this.scene.pause();
+      this.EndGame();
     }
     this.physics.overlap(this.trainsGroup,this.railsGroup,(o1, o2) => {
       //comprueba si el rail es compatible con el tren, es decir, si puede entrar por ese lado del rail
-      if(!o1.Compatible(o2)) this.scene.pause();
+      if(!o1.Compatible(o2)) this.EndGame();
     });
     
 
@@ -365,6 +365,14 @@ export default class Game extends Phaser.Scene {
     let returnObject = {found: found,water: waterFound};
     return returnObject;
 
+  }
+  EndGame(){
+    this.scene.pause(this);
+    let endScene = this.scene.get('end');
+    if(endScene===null){
+      this.scene.add('end',new EndMenu(this.score));
+      this.scene.launch('end');
+    }
   }
   // changeState(state)
   // {

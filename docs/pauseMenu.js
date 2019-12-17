@@ -1,5 +1,3 @@
-import Game, * as water from './game.js'
-
 
 export default class PauseMenu extends Phaser.Scene {
   constructor() {

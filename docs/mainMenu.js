@@ -1,4 +1,4 @@
-import Game, * as water from './game.js'
+import Game from './game.js'
 
 
 export default class MainMenu extends Phaser.Scene {
