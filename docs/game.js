@@ -10,9 +10,9 @@ const TILE_SIZE = 50;
 const COLUMNS = 28;
 const ROWS = 16;
 const POOL_LENGTH = 12; //Siempre par
-const INITIAL_TRAIN_SPEED = 5;
+const INITIAL_TRAIN_SPEED = 4;
 const SPEED_INCREASE = 2;
-const WATER_SLOTS = 50;
+const WATER_SLOTS = 7;
 
 export default class Game extends Phaser.Scene {
   constructor(level) {
@@ -101,14 +101,15 @@ export default class Game extends Phaser.Scene {
       this.createNewTrain();
       this.createPassenger();
       let rnd = Math.round(Math.random() * 10);
-      if(rnd>=8) this.createBox();
+      if(rnd>=7) this.createBox();
       this.currentSpeed += SPEED_INCREASE;
-      this.inventory.ModifyRailCounter(1, 'A')
+      rnd = Math.round(Math.random() * 10);
+      if(rnd<=7) this.inventory.ModifyRailCounter(1, 'A');
       this.score+=10;
       this.scoreText.setText('Puntos: '+ this.score);
       this.changeTrainSpeed();
     });
-    this.physics.add.collider(this.trainsGroup, this.boxsGroup, (o1, o2) => {
+    this.physics.add.collider(this.trainArray[0], this.boxsGroup, (o1, o2) => {
       o2.destroy();
       let rnd = Math.round(Math.random() * 10);
       if(rnd>=5){
@@ -267,7 +268,6 @@ export default class Game extends Phaser.Scene {
       this.railsGroup.add(rail);
     }
     
-    // console.log("lenght"+this.railPool.length);
   }
 
   CheckRails(){
@@ -278,8 +278,6 @@ export default class Game extends Phaser.Scene {
       if(this.railPool[i].ReturnRailType()===0 && tile.column === 24){counters.curvedRails++;}
       else if(this.railPool[i].ReturnRailType()===4 && tile.column === 26){counters.straightRails++;}
     }
-    // console.log("C"+counters.curvedRails);
-    // console.log("S"+counters.straightRails);
     return counters;
   }
 
