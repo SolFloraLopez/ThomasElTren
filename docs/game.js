@@ -12,7 +12,7 @@ const ROWS = 16;
 const POOL_LENGTH = 12; //Siempre par
 const INITIAL_TRAIN_SPEED = 5;
 const SPEED_INCREASE = 2;
-const WATER_SLOTS = 4;
+const WATER_SLOTS = 50;
 
 export default class Game extends Phaser.Scene {
   constructor(level) {
@@ -125,17 +125,21 @@ export default class Game extends Phaser.Scene {
       if(!o2.avoidable) this.EndGame();
     });
 
-    this.physics.add.collider(this.passengersGroup, this.backgroundLayer, () => {
-      o2.destroy();
+    this.physics.add.collider(this.passengersGroup, this.backgroundLayer, (o1,o2) => {
+      o1.destroy();
       this.createPassenger();
     });
-    this.physics.add.collider(this.boxsGroup, this.backgroundLayer, () => {
-      o2.destroy();
+    this.physics.add.collider(this.boxsGroup, this.backgroundLayer, (o1,o2) => {
+      o1.destroy();
       this.createBox();
     });
-    this.physics.add.collider(this.waterGroup, this.backgroundLayer, () => {
-      o2.destroy();
-      this.createWater();
+    this.physics.add.overlap(this.waterGroup, this.backgroundLayer, (o1,o2) => {
+      if(o2.collides){
+        console.log(o2.collides);
+        o1.destroy();
+        this.createWater();
+      }
+
     });
     this.physics.add.collider(this.trainsGroup, this.backgroundLayer, () => {
       this.EndGame();
