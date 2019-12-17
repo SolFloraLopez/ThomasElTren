@@ -28,9 +28,5 @@ export default class EndMenu extends Phaser.Scene {
     });
 
   }
-  update()
-  {
-    console.log("xxxxxxxxx");
-  }
   
 }

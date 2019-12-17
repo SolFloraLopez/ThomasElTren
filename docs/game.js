@@ -30,8 +30,12 @@ export default class Game extends Phaser.Scene {
 
   preload()
   {
-    this.load.tilemapTiledJSON('tilemap'+this.level,'./tilemap'+this.level+'.json')
-    this.load.image('patronesTilemap'+this.level,'img/terrain'+this.level+'.png')
+    this.load.tilemapTiledJSON('tilemap1','./tilemap1.json');
+    this.load.tilemapTiledJSON('tilemap2','./tilemap2.json');
+    this.load.tilemapTiledJSON('tilemap3','./tilemap3.json');
+    this.load.image('patronesTilemap1','img/terrain1.png');
+    this.load.image('patronesTilemap2','img/terrain2.png');
+    this.load.image('patronesTilemap3','img/terrain3.png');
     this.load.image('railsprite', 'img/rail.png', {frameWidth: 32, frameHeight: 48})
     this.load.image('trainsprite', 'img/trainwagon.png', { frameWidth: 50, frameHeight: 50 })
 
@@ -56,21 +60,21 @@ export default class Game extends Phaser.Scene {
     this.r = this.input.keyboard.addKey('R');
     this.esc = this.input.keyboard.addKey('ESC');
 
-    this.map.addTilesetImage('terrain','patronesTilemap'+this.level);
+    this.map.addTilesetImage('terrain'+this.level,'patronesTilemap'+this.level);
     //crea capa con tileset "terrain"
-    this.backgroundLayer = this.map.createStaticLayer('Background','terrain');
+    this.backgroundLayer = this.map.createStaticLayer('Background','terrain'+this.level);
     //se añade colision a las partes que tengan atributo collides == true
     this.backgroundLayer.setCollisionByProperty({collides: true});
     this.physics.world.setBounds(0, 0, 1400, 800);
     this.scoreText = this.add.text(1155, 15, 'Puntos: 0', { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif' ,fontSize: '35px'});
     
     //para ver la caja de colisiones del layer
-    const debugGraphics = this.add.graphics().setAlpha(0.75);
-    this.backgroundLayer.renderDebug(debugGraphics, {
-    tileColor: null, // Color of non-colliding tiles
-    collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
-    faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
-    });
+    // const debugGraphics = this.add.graphics().setAlpha(0.75);
+    // this.backgroundLayer.renderDebug(debugGraphics, {
+    // tileColor: null, // Color of non-colliding tiles
+    // collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
+    // faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
+    // });
 
     //grupos de colisiones
     this.railsGroup = this.physics.add.group();

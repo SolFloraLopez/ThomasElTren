@@ -32,9 +32,5 @@ export default class PauseMenu extends Phaser.Scene {
     });
 
   }
-  update()
-  {
-    console.log("eeeeeeeee");
-  }
   
 }
