@@ -3,6 +3,7 @@ import Train, * as train from './train.js'
 import Rail, * as rail from './Rail.js'
 import Collectible, * as collectible from './collectible.js'
 import Water, * as water from './water.js'
+import Wagon from './wagon.js'
 import Inventory, * as inventory from './inventory.js'
 import {directionEnum, matrixEnum, stateEnum} from './Enums.js'
 
@@ -24,7 +25,11 @@ export default class Game extends Phaser.Scene {
     this.state = stateEnum.ONTRACK;
     this.currentSpeed = INITIAL_TRAIN_SPEED;
     this.railPool = [];
-    this.trainArray = [];
+
+    this.train;
+    this.wagonsArray = [];
+    this.wagonSpacer = 160;
+
     this.aestheticRails = [];
   }
 
@@ -37,7 +42,8 @@ export default class Game extends Phaser.Scene {
     this.load.image('patronesTilemap2','img/terrain2.png');
     this.load.image('patronesTilemap3','img/terrain3.png');
     this.load.image('railsprite', 'img/rail.png', {frameWidth: 32, frameHeight: 48})
-    this.load.image('trainsprite', 'img/trainwagon.png', { frameWidth: 50, frameHeight: 50 })
+    this.load.image('trainsprite', 'img/train.png', { frameWidth: 50, frameHeight: 50 })
+    this.load.image('wagonsprite', 'img/wagon.png', { frameWidth: 50, frameHeight: 50 })
 
     this.load.image('passengersprite', 'img/passenger.png', { frameWidth: 50, frameHeight: 50 })
     this.load.image('boxsprite', 'img/box.png', { frameWidth: 50, frameHeight: 50 })
@@ -78,7 +84,7 @@ export default class Game extends Phaser.Scene {
 
     //grupos de colisiones
     this.railsGroup = this.physics.add.group();
-    this.trainsGroup = this.physics.add.group();
+    // this.trainsGroup = this.physics.add.group();
     this.passengersGroup = this.physics.add.group();
     this.boxsGroup = this.physics.add.group();
     this.waterGroup = this.physics.add.group();
@@ -87,18 +93,23 @@ export default class Game extends Phaser.Scene {
 
     //Crea agua en el mapa
     for(let i=0;i<WATER_SLOTS;i++) this.createWater();
-
-    this.trainArray[0] = new Train(this, 11 * TILE_SIZE + TILE_SIZE / 2, 15 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
-    this.trainArray[1] = new Train(this, 11 * TILE_SIZE + TILE_SIZE / 2, 16 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
+    //Inicia el tren
+    this.train = new Train(this, 11 * TILE_SIZE + TILE_SIZE / 2, 15 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
+    //Inicia el primer vagon
+      this.wagonsArray[1] = new Wagon(this,this.train,this.wagonSpacer, 11 * TILE_SIZE + TILE_SIZE / 2, 16 * TILE_SIZE + TILE_SIZE / 2, 'wagonsprite');
+    // for (var i = 0; i <= this.wagonsNum * this.wagonSpacer; i++)
+    // {
+    //   this.wagonPath[i] = new Phaser.Geom.Point(this.train.x, this.train.y);
+    // }
     //se añaden a los grupos de colisiones
     this.passengersGroup.add(this.passenger);
-    this.trainsGroup.add(this.trainArray[0]);
-    this.trainsGroup.add(this.trainArray[1]);
+    // this.trainsGroup.add(this.train);
+    // this.trainsGroup.add(this.wagonsArray[1]);
 
     //creacion de colisiones entre entidades, y callbacks
-    this.physics.add.collider(this.trainsGroup, this.passengersGroup, (o1, o2) => {
+    this.physics.add.collider(this.train, this.passengersGroup, (o1, o2) => {
       o2.destroy();
-      this.createNewTrain();
+      this.createNewWagon();
       this.createPassenger();
       let rnd = Math.round(Math.random() * 10);
       if(rnd>=7) this.createBox();
@@ -109,7 +120,7 @@ export default class Game extends Phaser.Scene {
       this.scoreText.setText('Puntos: '+ this.score);
       this.changeTrainSpeed();
     });
-    this.physics.add.collider(this.trainArray[0], this.boxsGroup, (o1, o2) => {
+    this.physics.add.collider(this.train, this.boxsGroup, (o1, o2) => {
       o2.destroy();
       let rnd = Math.round(Math.random() * 10);
       if(rnd>=5){
@@ -121,28 +132,31 @@ export default class Game extends Phaser.Scene {
       }
 
     });
-    this.physics.add.overlap(this.trainsGroup, this.waterGroup, (o1,o2) => {
+    this.physics.add.overlap(this.train, this.waterGroup, (o1,o2) => {
       console.log(o2.avoidable);
       if(!o2.avoidable) this.EndGame();
     });
 
-    this.physics.add.collider(this.passengersGroup, this.backgroundLayer, (o1,o2) => {
-      o1.destroy();
-      this.createPassenger();
+    this.physics.add.overlap(this.passengersGroup, this.backgroundLayer, (o1,o2) => {
+      if(o2.collides){
+        o1.destroy();
+        this.createPassenger();
+      }
     });
-    this.physics.add.collider(this.boxsGroup, this.backgroundLayer, (o1,o2) => {
-      o1.destroy();
-      this.createBox();
+    this.physics.add.overlap(this.boxsGroup, this.backgroundLayer, (o1,o2) => {
+      if(o2.collides){
+        o1.destroy();
+       this.createBox();
+      }
     });
     this.physics.add.overlap(this.waterGroup, this.backgroundLayer, (o1,o2) => {
       if(o2.collides){
-        console.log(o2.collides);
         o1.destroy();
         this.createWater();
       }
 
     });
-    this.physics.add.collider(this.trainsGroup, this.backgroundLayer, () => {
+    this.physics.add.collider(this.train, this.backgroundLayer, () => {
       this.EndGame();
     });
 
@@ -160,18 +174,7 @@ export default class Game extends Phaser.Scene {
       this.scene.launch('pause');
       this.scene.pause(this);
     });
-    // this.input.on('pointerdown', (pointer,gameObject)=>{
-    //   let column = Math.floor(pointer.worldX / 50)
-    //   console.log(column);
-    //   console.log(gameObject);
-    // });
 
-  //   this.input.on('pointerdown', function (pointer) {
-  //     console.log(pointer.x);
-  //     this.scene.inventory.ModifyRailCounter(-1);
-  //     console.log("222");
-  // });
-    // new Rail(this, 10, 10, 'Railsprite', this.input.activePointer, 0);
 
     this.inventory = new Inventory(this,(POOL_LENGTH/2)-1);
     for(let i = 0; i < POOL_LENGTH; i++)
@@ -191,8 +194,6 @@ export default class Game extends Phaser.Scene {
       //ademas de crearlos se añaden al grupo de colisiones
       this.railsGroup.add(this.railPool[i]);
 
-      // console.log(this.railPool[i].ReturnTile());
-      // console.log(this.railPool[i].ReturnOrientation());
     }
 
   }
@@ -203,8 +204,9 @@ export default class Game extends Phaser.Scene {
     //si se superponen trenes y railes
     if(this.Exit()){
       this.EndGame();
+      console.log("ecit");
     }
-    this.physics.overlap(this.trainsGroup,this.railsGroup,(o1, o2) => {
+    this.physics.overlap(this.train,this.railsGroup,(o1, o2) => {
       //comprueba si el rail es compatible con el tren, es decir, si puede entrar por ese lado del rail
       if(!o1.Compatible(o2)) this.EndGame();
     });
@@ -212,17 +214,11 @@ export default class Game extends Phaser.Scene {
 
     this.CheckAestheticRails();
   }
-  createNewTrain()
+  createNewWagon()
   {
-    let tailDir = this.trainArray[this.trainArray.length - 1].ReturnDirection();
-    let tailPos = this.trainArray[this.trainArray.length - 1].ReturnPos();
-    let trainPos;
 
-    if (Math.abs(tailDir) == 2) trainPos = { x: tailPos.x, y: tailPos.y - TILE_SIZE * tailDir / 2};
-    else trainPos = { x: tailPos.x - TILE_SIZE * tailDir, y: tailPos.y};
+    this.wagonsArray[this.wagonsArray.length] = new Wagon(this,this.wagonsArray[this.wagonsArray.length-1],this.wagonSpacer,this.wagonsArray[this.wagonsArray.length-1].x,this.wagonsArray[this.wagonsArray.length-1].y,'wagonsprite');
 
-    this.trainArray[this.trainArray.length] = new Train(this, trainPos.x, trainPos.y, 'trainsprite', INITIAL_TRAIN_SPEED, tailDir);
-    this.trainsGroup.add(this.trainArray[this.trainArray.length - 1]);
   }
 
   createPassenger()
@@ -249,10 +245,7 @@ export default class Game extends Phaser.Scene {
 
   changeTrainSpeed()
   {
-    for(let i = 0; i < this.trainArray.length; i++)
-    {
-      this.trainArray[i].ChangeSpeed(this.currentSpeed);
-    }
+    // this.train.ChangeSpeed(this.currentSpeed);
   }
   //si quedan 2 railes de un tipo en el inventario, genera nuevos.
   CreateRail(){
@@ -285,7 +278,7 @@ export default class Game extends Phaser.Scene {
   {
     let flag = false;
     let aestheticRailTile;
-    let trainHeadTile = this.trainArray[0].ReturnTile();
+    let trainHeadTile = this.train.ReturnTile();
 
     this.AestheticRailsCreation(flag, aestheticRailTile, trainHeadTile);
 
@@ -297,7 +290,7 @@ export default class Game extends Phaser.Scene {
   AestheticRailsCreation(flag, aestheticRailTile, trainHeadTile)
   {
     let i = 0;
-    let trainHeadDir = this.trainArray[0].ReturnDirection();
+    let trainHeadDir = this.train.ReturnDirection();
 
     if(this.aestheticRails.length > 0) 
     {   
@@ -323,11 +316,11 @@ export default class Game extends Phaser.Scene {
 
   AestheticRailsDestruction(flag, aestheticRailTile, trainHeadTile)
   {
-    let i = 0;
+    let i = 1;
 
-    while(!flag && i < this.trainArray.length) 
+    while(!flag && i < this.wagonsArray.length) 
     {
-      trainHeadTile = this.trainArray[i].ReturnTile();
+      trainHeadTile = this.wagonsArray[i].ReturnTile();
       if (aestheticRailTile.column === trainHeadTile.column && aestheticRailTile.row === trainHeadTile.row) flag = true;
       i++;
     }
@@ -355,7 +348,7 @@ export default class Game extends Phaser.Scene {
 
   Exit(){
     let pos;
-    pos = this.trainArray[0].ReturnPos();
+    pos = this.train.ReturnPos();
     if(pos.x < TILE_SIZE/3 || pos.y < TILE_SIZE/3 || pos.y > (TILE_SIZE * ROWS)-TILE_SIZE/3) return true;
   }
   SearchWater(pointerPos){

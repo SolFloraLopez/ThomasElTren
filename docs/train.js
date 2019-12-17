@@ -7,7 +7,7 @@ export default class Train extends Phaser.Physics.Arcade.Sprite
         super(scene, x, y, texture);
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        this.setCollideWorldBounds(true)
+        this.setCollideWorldBounds(false);
         this.body.setSize(40,40);
 
         this.column = Math.floor(this.x / 50);
