@@ -30,9 +30,9 @@ export default class Game extends Phaser.Scene {
 
   preload()
   {
-    this.load.tilemapTiledJSON('tilemap1','./tilemap1.json');
-    this.load.tilemapTiledJSON('tilemap2','./tilemap2.json');
-    this.load.tilemapTiledJSON('tilemap3','./tilemap3.json');
+    this.load.tilemapTiledJSON('tilemap1','tilemaps/tilemap1.json');
+    this.load.tilemapTiledJSON('tilemap2','tilemaps/tilemap2.json');
+    this.load.tilemapTiledJSON('tilemap3','tilemaps/tilemap3.json');
     this.load.image('patronesTilemap1','img/terrain1.png');
     this.load.image('patronesTilemap2','img/terrain2.png');
     this.load.image('patronesTilemap3','img/terrain3.png');
@@ -83,7 +83,7 @@ export default class Game extends Phaser.Scene {
     this.boxsGroup = this.physics.add.group();
     this.waterGroup = this.physics.add.group();
     //crea las entidades (los pasajeros seran un array tambien)
-    this.passenger = new Collectible(this, 14, 9, 'passengersprite');
+    this.passenger = new Collectible(this, 11, 9, 'passengersprite');
 
     //Crea agua en el mapa
     for(let i=0;i<WATER_SLOTS;i++) this.createWater();
