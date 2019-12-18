@@ -12,7 +12,7 @@ const COLUMNS = 28;
 const ROWS = 16;
 const POOL_LENGTH = 12; //Siempre par
 const INITIAL_TRAIN_SPEED = 4;
-const SPEED_INCREASE = 0.4;
+const SPEED_INCREASE = 0.8;
 const WATER_SLOTS = 7;
 
 export default class Game extends Phaser.Scene {
@@ -29,7 +29,7 @@ export default class Game extends Phaser.Scene {
     this.train;
     this.wagonsArray = [];
     this.wagonSpacer = 160;
-
+    this.minSpacer = 30;
     this.aestheticRails = [];
   }
 
@@ -42,6 +42,8 @@ export default class Game extends Phaser.Scene {
     this.load.image('patronesTilemap2','img/terrain2.png');
     this.load.image('patronesTilemap3','img/terrain3.png');
     this.load.image('railsprite', 'img/rail.png', {frameWidth: 32, frameHeight: 48})
+    this.load.image('bridgerailsprite', 'img/bridgeRail.png', {frameWidth: 32, frameHeight: 48})
+
     this.load.image('trainsprite', 'img/train.png', { frameWidth: 50, frameHeight: 50 })
     this.load.image('wagonsprite', 'img/wagon.png', { frameWidth: 50, frameHeight: 50 })
 
@@ -50,6 +52,8 @@ export default class Game extends Phaser.Scene {
     this.load.image('watersprite', 'img/water.png', { frameWidth: 50, frameHeight: 50 })
 
     this.load.image('curvedrailsprite', 'img/curvedrail.png', {frameWidth: 32, frameHeight: 32})
+
+    this.load.audio('button', ['/soundFiles/buttonSound.mp3', '/soundFiles/buttonSound.ogg']);
 
   }
 
@@ -92,12 +96,14 @@ export default class Game extends Phaser.Scene {
     //crea las entidades (los pasajeros seran un array tambien)
     this.passenger = new Collectible(this, 11, 9, 'passengersprite');
 
+    this.buttonSound = this.sound.add('button');
+
     //Crea agua en el mapa
     for(let i=0;i<WATER_SLOTS;i++) this.createWater();
     //Inicia el tren
     this.train = new Train(this, 11 * TILE_SIZE + TILE_SIZE / 2, 15 * TILE_SIZE + TILE_SIZE / 2, 'trainsprite', INITIAL_TRAIN_SPEED, directionEnum.UP);
     //Inicia el primer vagon
-      this.wagonsArray[1] = new Wagon(this,this.train,this.wagonSpacer, 11 * TILE_SIZE + TILE_SIZE / 2, 16 * TILE_SIZE + TILE_SIZE / 2, 'wagonsprite');
+      this.wagonsArray[0] = new Wagon(this,this.train,this.wagonSpacer, this.minSpacer, 11 * TILE_SIZE + TILE_SIZE / 2, 16 * TILE_SIZE + TILE_SIZE / 2, 'wagonsprite');
     // for (var i = 0; i <= this.wagonsNum * this.wagonSpacer; i++)
     // {
     //   this.wagonPath[i] = new Phaser.Geom.Point(this.train.x, this.train.y);
@@ -110,6 +116,7 @@ export default class Game extends Phaser.Scene {
     //creacion de colisiones entre entidades, y callbacks
     this.physics.add.collider(this.train, this.passengersGroup, (o1, o2) => {
       o2.destroy();
+      this.changeWagonSpacer();
       this.createNewWagon();
       this.createPassenger();
       let rnd = Math.round(Math.random() * 10);
@@ -190,7 +197,7 @@ export default class Game extends Phaser.Scene {
 
       }
       else {
-        this.railPool[i] = new Rail(this, 26, 8, 'railsprite', this.input.activePointer, railType, TILE_SIZE,this.inventory);
+        this.railPool[i] = new Rail(this, 26, 8, 'bridgerailsprite', this.input.activePointer, railType, TILE_SIZE,this.inventory);
 
       }
       
@@ -220,7 +227,7 @@ export default class Game extends Phaser.Scene {
   }
   createNewWagon()
   {
-    this.wagonsArray[this.wagonsArray.length] = new Wagon(this,this.wagonsArray[this.wagonsArray.length-1],this.wagonSpacer,this.wagonsArray[this.wagonsArray.length-1].x,this.wagonsArray[this.wagonsArray.length-1].y,'wagonsprite');
+    this.wagonsArray[this.wagonsArray.length] = new Wagon(this,this.wagonsArray[this.wagonsArray.length-1],this.wagonSpacer,this.minSpacer,this.wagonsArray[this.wagonsArray.length-1].x,this.wagonsArray[this.wagonsArray.length-1].y,'wagonsprite');
     this.wagonsGroup.add(this.wagonsArray[this.wagonsArray.length-1]);
   }
 
@@ -250,6 +257,17 @@ export default class Game extends Phaser.Scene {
   {
     this.train.ChangeSpeed(this.currentSpeed);
   }
+
+  changeWagonSpacer()
+  {
+    this.wagonSpacer -= SPEED_INCREASE * 10;
+    if(this.wagonSpacer < this.minSpacer) this.wagonSpacer = this.minSpacer;
+
+    for(let i = 0; i < this.wagonsArray.length; i++)
+    {
+      this.wagonsArray[i].updateCounter(SPEED_INCREASE * 10);
+    }
+  }
   //si quedan 2 railes de un tipo en el inventario, genera nuevos.
   CreateRail(){
     let counters = this.CheckRails();
@@ -259,7 +277,7 @@ export default class Game extends Phaser.Scene {
       this.railsGroup.add(rail);
     }
     if (counters.straightRails<=1){
-      let rail =  new Rail(this, 26, 8, 'railsprite', this.input.activePointer, 4, TILE_SIZE,this.inventory)
+      let rail =  new Rail(this, 26, 8, 'bridgerailsprite', this.input.activePointer, 4, TILE_SIZE,this.inventory)
       this.railPool[this.railPool.length] = rail;
       this.railsGroup.add(rail);
     }

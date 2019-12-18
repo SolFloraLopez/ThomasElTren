@@ -19,6 +19,9 @@ export default class MainMenu extends Phaser.Scene {
     this.load.image('level3', 'img/desertLevel.png');
     this.load.image('lock', 'img/lock.png');
     this.load.image('credits', 'img/credits.png');
+    
+    this.load.audio('button', ['/soundFiles/buttonSound.mp3', '/soundFiles/buttonSound.ogg']);
+    this.load.audio('buttonHover', ['/soundFiles/buttonHoverSound.mp3', '/soundFiles/buttonHoverSound.ogg']);
   }
 
   create()
@@ -46,6 +49,9 @@ export default class MainMenu extends Phaser.Scene {
     menuButton.visible = false;
     menuButton.setDepth(1);
 
+    this.buttonSound = this.sound.add('button');
+    this.buttonHoverSound = this.sound.add('buttonHover');
+
     this.playLockedBtn = this.add.image(420,640,'playlockedBtn').setOrigin(0);
     playButton.setInteractive();
     lvl1Btn.setInteractive();
@@ -56,6 +62,7 @@ export default class MainMenu extends Phaser.Scene {
 
     playButton.on('pointerup',()=>{
       console.log(this.levelSelected);
+      if(!this.credits.visible)this.buttonSound.play();
       if(this.levelSelected!=0){
         this.scene.add('main',new Game(this.levelSelected));
         this.scene.start('main');
@@ -63,31 +70,39 @@ export default class MainMenu extends Phaser.Scene {
     });
     lvl1Btn.on('pointerover',()=>{
       framW.setPosition(lvl1Btn.x,lvl1Btn.y);
+      if(!this.credits.visible) this-this.buttonHoverSound.play();
     });
     lvl2Btn.on('pointerover',()=>{
       framW.setPosition(lvl2Btn.x,lvl2Btn.y);
+      if(!this.credits.visible) this-this.buttonHoverSound.play();
     });
     lvl3Btn.on('pointerover',()=>{
       framW.setPosition(lvl3Btn.x,lvl3Btn.y);
+      if(!this.credits.visible) this-this.buttonHoverSound.play();
     });
 
     lvl1Btn.on('pointerup',()=>{
       this.lock.setPosition(lvl1Btn.x,lvl1Btn.y);
+      if(!this.credits.visible) this.buttonSound.play();
       this.LockLevel(1);
     });
     lvl2Btn.on('pointerup',()=>{
       this.lock.setPosition(lvl2Btn.x,lvl2Btn.y);
+      if(!this.credits.visible)this.buttonSound.play();
       this.LockLevel(2);
     });
     lvl3Btn.on('pointerup',()=>{
       this.lock.setPosition(lvl3Btn.x,lvl3Btn.y);
+      if(!this.credits.visible)this.buttonSound.play();
       this.LockLevel(3);
     });
     infoButton.on('pointerup',()=>{
+      this.buttonSound.play();
       this.credits.visible = true;
       menuButton.visible = true;
     });
     menuButton.on('pointerup',()=>{
+      this.buttonSound.play();
       this.credits.visible = false;
       menuButton.visible = false;
     });

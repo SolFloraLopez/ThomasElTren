@@ -2,7 +2,7 @@ import {directionEnum, matrixEnum, stateEnum, } from './Enums.js'
 
 export default class Wagon extends Phaser.Physics.Arcade.Sprite
 { 
-    constructor(scene,targetToFollow,spacer, x, y, texture)
+    constructor(scene,targetToFollow,spacer, wagonThreshold, x, y, texture)
     {
         super(scene, x, y, texture);
         scene.add.existing(this);
@@ -12,6 +12,9 @@ export default class Wagon extends Phaser.Physics.Arcade.Sprite
         this.wagonPath=[];
         this.target = targetToFollow;
         this.spacer = spacer;
+        this.counter = 0;
+        this.wagonThreshold = wagonThreshold;
+        this.reduceSpacer = false;
 
         this.column = Math.floor(this.x / 50);
         this.row = Math.floor(this.y / 50);
@@ -31,12 +34,22 @@ export default class Wagon extends Phaser.Physics.Arcade.Sprite
 
         let part = this.wagonPath.pop();
 
-        part.setTo(this.target.x, this.target.y);
+        if(!this.reduceSpacer)
+        {
+            part.setTo(this.target.x, this.target.y);
+            this.wagonPath.unshift(part);
+        } 
+        else if (this.counter > 0)
+        {
+            this.counter--;
+            if (this.counter <= 0 || this.wagonPath.length < this.wagonThreshold) this.reduceSpacer = false;
+        }
+        
+        if(this.x !== (this.wagonPath[this.wagonPath.length - 1]).x) this.angle = 90;
+        else if(this.y !== (this.wagonPath[this.wagonPath.length - 1]).y) this.angle = 0;
 
-        this.wagonPath.unshift(part);
-
-        this.x = (this.wagonPath[this.spacer]).x;
-        this.y = (this.wagonPath[this.spacer]).y;
+        this.x = (this.wagonPath[this.wagonPath.length - 1]).x;
+        this.y = (this.wagonPath[this.wagonPath.length - 1]).y;
         
     }
 
@@ -45,6 +58,16 @@ export default class Wagon extends Phaser.Physics.Arcade.Sprite
         let tile = {column: this.column, row: this.row}
 
         return tile;
+    }
+
+    updateCounter(amount)
+    {
+        this.counter += amount;
+        if (this.counter >= 1) 
+        {
+            this.counter -= 1;
+            this.reduceSpacer = true;
+        } 
     }
 
 }

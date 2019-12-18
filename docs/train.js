@@ -85,7 +85,23 @@ export default class Train extends Phaser.Physics.Arcade.Sprite
     ChangeDirection(direction)
     {
         this.direction = direction;
-        this.angle = this.direction * 90;
+        
+
+        switch(direction)
+        {
+            case directionEnum.UP:
+                this.angle = 180;
+                break;
+            case directionEnum.DOWN:
+                this.angle = 0;
+                break;
+            case directionEnum.RIGHT:
+                this.angle = 270;
+                break;
+            case directionEnum.LEFT:
+                this.angle = 90;
+                break;
+        }
     }
 
     ReturnPos()
