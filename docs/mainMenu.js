@@ -22,11 +22,11 @@ export default class MainMenu extends Phaser.Scene {
   {
 
     this.add.image(0,0,'menuBG').setOrigin(0);
-    let lvl1Btn =  this.add.image(80,200,'level1').setOrigin(0);
-    let lvl2Btn =  this.add.image(490,200,'level2').setOrigin(0);
-    let lvl3Btn =  this.add.image(900,200,'level3').setOrigin(0);
-    let framW = this.add.image(80,200,'fW').setOrigin(0);
-    this.lock = this.add.image(80,200,'lock').setOrigin(0);
+    let lvl1Btn =  this.add.image(130,310,'level1').setOrigin(0);
+    let lvl2Btn =  this.add.image(540,310,'level2').setOrigin(0);
+    let lvl3Btn =  this.add.image(950,310,'level3').setOrigin(0);
+    let framW = this.add.image(130,310,'fW').setOrigin(0);
+    this.lock = this.add.image(130,310,'lock').setOrigin(0);
     this.lock.visible = false;
     this.levelSelected=0;
 
