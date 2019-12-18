@@ -39,7 +39,7 @@ export default class MainMenu extends Phaser.Scene {
     this.credits.setActive(false);
     this.lock.visible = false;
     this.levelSelected=0;
-
+    this.sound.stopAll();
 
 
 
