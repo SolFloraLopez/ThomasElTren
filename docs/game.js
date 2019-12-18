@@ -12,7 +12,7 @@ const COLUMNS = 28;
 const ROWS = 16;
 const POOL_LENGTH = 12; //Siempre par
 const INITIAL_TRAIN_SPEED = 4;
-const SPEED_INCREASE = 2;
+const SPEED_INCREASE = 0.4;
 const WATER_SLOTS = 7;
 
 export default class Game extends Phaser.Scene {
@@ -88,6 +88,7 @@ export default class Game extends Phaser.Scene {
     this.passengersGroup = this.physics.add.group();
     this.boxsGroup = this.physics.add.group();
     this.waterGroup = this.physics.add.group();
+    this.wagonsGroup = this.physics.add.group();
     //crea las entidades (los pasajeros seran un array tambien)
     this.passenger = new Collectible(this, 11, 9, 'passengersprite');
 
@@ -132,8 +133,10 @@ export default class Game extends Phaser.Scene {
       }
 
     });
+    this.physics.add.collider(this.train, this.wagonsGroup, (o1, o2) => {
+      this.EndGame();
+    });
     this.physics.add.overlap(this.train, this.waterGroup, (o1,o2) => {
-      console.log(o2.avoidable);
       if(!o2.avoidable) this.EndGame();
     });
 
@@ -199,12 +202,13 @@ export default class Game extends Phaser.Scene {
   }
   update()
   {
+    // console.log(this.train.x-this.wagonsArray[1].x);
+    // console.log(this.train.y-this.wagonsArray[1].y);
     //Nota: como ya no se puede comprobar la posición exacta del tren con el rail para cambiar la direccion (porque con las fisicas se salta frames) hay que poner un pequeño offset en las comprobaciones
     //y abarcar todos los casos en Compatible();
     //si se superponen trenes y railes
     if(this.Exit()){
       this.EndGame();
-      console.log("ecit");
     }
     this.physics.overlap(this.train,this.railsGroup,(o1, o2) => {
       //comprueba si el rail es compatible con el tren, es decir, si puede entrar por ese lado del rail
@@ -216,9 +220,8 @@ export default class Game extends Phaser.Scene {
   }
   createNewWagon()
   {
-
     this.wagonsArray[this.wagonsArray.length] = new Wagon(this,this.wagonsArray[this.wagonsArray.length-1],this.wagonSpacer,this.wagonsArray[this.wagonsArray.length-1].x,this.wagonsArray[this.wagonsArray.length-1].y,'wagonsprite');
-
+    this.wagonsGroup.add(this.wagonsArray[this.wagonsArray.length-1]);
   }
 
   createPassenger()
@@ -245,7 +248,7 @@ export default class Game extends Phaser.Scene {
 
   changeTrainSpeed()
   {
-    // this.train.ChangeSpeed(this.currentSpeed);
+    this.train.ChangeSpeed(this.currentSpeed);
   }
   //si quedan 2 railes de un tipo en el inventario, genera nuevos.
   CreateRail(){
