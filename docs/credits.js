@@ -30,10 +30,6 @@ export default class MainMenu extends Phaser.Scene {
     let lvl3Btn =  this.add.image(950,310,'level3').setOrigin(0);
     let framW = this.add.image(130,310,'fW').setOrigin(0);
     this.lock = this.add.image(130,310,'lock').setOrigin(0);
-    this.credits = this.add.image(0,0,'credits').setOrigin(0);
-    this.credits.setDepth(1);
-    this.credits.visible = false;
-    this.credits.setActive(false);
     this.lock.visible = false;
     this.levelSelected=0;
 
@@ -42,17 +38,11 @@ export default class MainMenu extends Phaser.Scene {
 
     let playButton = this.add.image(420,640,'playBtn').setOrigin(0);
     let infoButton = this.add.image(1030,640,'infoBtn').setOrigin(0);
-    let menuButton = this.add.image(415,580,'menuBtn').setOrigin(0);
-    menuButton.visible = false;
-    menuButton.setDepth(1);
-
     this.playLockedBtn = this.add.image(420,640,'playlockedBtn').setOrigin(0);
     playButton.setInteractive();
     lvl1Btn.setInteractive();
     lvl2Btn.setInteractive();
     lvl3Btn.setInteractive();
-    infoButton.setInteractive();
-    menuButton.setInteractive();
 
     playButton.on('pointerup',()=>{
       console.log(this.levelSelected);
@@ -84,12 +74,7 @@ export default class MainMenu extends Phaser.Scene {
       this.LockLevel(3);
     });
     infoButton.on('pointerup',()=>{
-      this.credits.visible = true;
-      menuButton.visible = true;
-    });
-    menuButton.on('pointerup',()=>{
-      this.credits.visible = false;
-      menuButton.visible = false;
+
     });
 
   }
