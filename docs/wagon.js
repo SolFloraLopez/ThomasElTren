@@ -39,25 +39,6 @@ export default class Wagon extends Phaser.Physics.Arcade.Sprite
         this.y = (this.wagonPath[this.spacer]).y;
         
     }
-    UpdateSpeed(){
-        for (var i = 1; i <= this.spacer; i++)
-        {
-          this.wagonPath[i] = new Phaser.Geom.Point(this.target.x, this.target.y);
-        }
-    }
-
-
-     
-    // Move(amount,time,delta)
-    // {
-    //     this.body.setVelocity(0);
-    //     if(this.direction !== directionEnum.NONE){
-    //         if(this.direction === directionEnum.UP || this.direction === directionEnum.DOWN) this.body.setVelocityY(amount * delta * this.direction/2)
-    //         else this.body.setVelocityX(amount * delta * this.direction);
-    //     }
-        
-
-    // }
 
     ReturnTile()
     {
